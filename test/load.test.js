@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const apiMethods = require('..');
+const load = require('../lib/load');
 
 function validate(model) {
   model.forEach(method => {
@@ -14,16 +14,16 @@ function validate(model) {
 describe('model', () => {
   describe('validation', () => {
     it('should reject if API is not an object', () => {
-      expect(() => apiMethods.model()).to.throw();
-      expect(() => apiMethods.model(null)).to.throw();
-      expect(() => apiMethods.model(1)).to.throw();
-      expect(() => apiMethods.model('a')).to.throw();
-      expect(() => apiMethods.model(true)).to.throw();
-      expect(() => apiMethods.model(()=>{})).to.throw();
+      expect(() => load()).to.throw();
+      expect(() => load(null)).to.throw();
+      expect(() => load(1)).to.throw();
+      expect(() => load('a')).to.throw();
+      expect(() => load(true)).to.throw();
+      expect(() => load(()=>{})).to.throw();
     });
 
     it('should reject an invalid API', () => {
-      expect(() => apiMethods.model({'foo':'bar'})).to.throw();
+      expect(() => load({'foo':'bar'})).to.throw();
     });
 
     it('should reject if handler is not a function', () => {
@@ -32,7 +32,7 @@ describe('model', () => {
           handler: 1,
         },
       };
-      expect(() => apiMethods.model(api)).to.throw();
+      expect(() => load(api)).to.throw();
     });
 
     it('should reject if args is not an object', () => {
@@ -42,7 +42,7 @@ describe('model', () => {
           args: 1,
         },
       };
-      expect(() => apiMethods.model(api)).to.throw();
+      expect(() => load(api)).to.throw();
     });
 
     it('should reject if one of the args is not a parameter in the handler', () => {
@@ -55,7 +55,7 @@ describe('model', () => {
           },
         },
       };
-      expect(() => apiMethods.model(api)).to.throw();
+      expect(() => load(api)).to.throw();
     });
 
     it('should reject if args is ill-formed', () => {
@@ -69,20 +69,20 @@ describe('model', () => {
           },
         },
       };
-      expect(() => apiMethods.model(api)).to.throw();
+      expect(() => load(api)).to.throw();
     });
 
     it('should reject a method with no handler', () => {
       const api = {
         "method": {},
       };
-      expect(() => apiMethods.model(api)).to.throw();
+      expect(() => load(api)).to.throw();
     });
   });
 
   describe('results', () => {
     it('should accept an API with no endpoints', () => {
-      const model = apiMethods.model({});
+      const model = load({});
       expect(model).to.be.an('array').that.is.empty;
     });
 
@@ -101,7 +101,7 @@ describe('model', () => {
           },
         },
       };
-      const model = apiMethods.model(api);
+      const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
     });
@@ -119,10 +119,10 @@ describe('model', () => {
         prefix: 'foo',
       };
 
-      const modelWithoutOptions = apiMethods.model(api);
+      const modelWithoutOptions = load(api);
       expect(modelWithoutOptions[0].route).to.equal('/noop');
 
-      const modelWithOptions = apiMethods.model(api, options);
+      const modelWithOptions = load(api, options);
       expect(modelWithOptions[0].route).to.equal('/foo/noop');
     });
   });

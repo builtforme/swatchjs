@@ -1,7 +1,7 @@
 'use strict';
 
-const model = require('./lib/model');
+const load = require('./lib/load');
 
 module.exports = {
-  model,
+  load,
 };
