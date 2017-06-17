@@ -31,6 +31,22 @@ describe('model', () => {
       expect(model).to.be.an('array').that.is.empty;
     });
 
+    it('should reject a method with no handler', () => {
+      const api = {
+        "method": {},
+      };
+      expect(() => apiMethods.model(api)).to.throw();
+    });
+
+    it('should reject if handler is not a function', () => {
+      const api = {
+        "noop": {
+          handler: 1,
+        },
+      };
+      expect(() => apiMethods.model(api)).to.throw();
+    });
+
     it('should produce an endpoint metadata array', () => {
       const add = (a, b) => a + b;
       const api = {
@@ -51,6 +67,26 @@ describe('model', () => {
       const model = apiMethods.model(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
+    });
+  });
+
+  describe('options', () => {
+    it('use route prefix', () => {
+      const fn = () => {};
+      const api = {
+        "noop": {
+          handler: fn,
+        },
+      };
+      const options = {
+        prefix: 'foo',
+      };
+
+      const modelWithoutOptions = apiMethods.model(api);
+      expect(modelWithoutOptions[0].route).to.equal('/noop');
+
+      const modelWithOptions = apiMethods.model(api, options);
+      expect(modelWithOptions[0].route).to.equal('/foo/noop');
     });
   });
 });
