@@ -31,12 +31,11 @@ const api = {
         handler: add,
         args: {
             a: {
-                type: Number,
-                required: true,
+                parse: Number,
             },
             b: {
-                type: Number,
-                required: true,
+                parse: Number,
+                optional: true,
             },
         },
     },

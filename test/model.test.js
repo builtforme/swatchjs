@@ -12,7 +12,7 @@ function validate(model) {
 }
 
 describe('model', () => {
-  describe('types', () => {
+  describe('validation', () => {
     it('should reject if API is not an object', () => {
       expect(() => apiMethods.model()).to.throw();
       expect(() => apiMethods.model(null)).to.throw();
@@ -26,18 +26,6 @@ describe('model', () => {
       expect(() => apiMethods.model({'foo':'bar'})).to.throw();
     });
 
-    it('should accept an API with no endpoints', () => {
-      const model = apiMethods.model({});
-      expect(model).to.be.an('array').that.is.empty;
-    });
-
-    it('should reject a method with no handler', () => {
-      const api = {
-        "method": {},
-      };
-      expect(() => apiMethods.model(api)).to.throw();
-    });
-
     it('should reject if handler is not a function', () => {
       const api = {
         "noop": {
@@ -47,6 +35,57 @@ describe('model', () => {
       expect(() => apiMethods.model(api)).to.throw();
     });
 
+    it('should reject if args is not an object', () => {
+      const api = {
+        "noop": {
+          handler: () => {},
+          args: 1,
+        },
+      };
+      expect(() => apiMethods.model(api)).to.throw();
+    });
+
+    it('should reject if one of the args is not a parameter in the handler', () => {
+      const api = {
+        "noop": {
+          handler: (a, b) => {},
+          args: {
+            a: {},
+            c: {},
+          },
+        },
+      };
+      expect(() => apiMethods.model(api)).to.throw();
+    });
+
+    it('should reject if args is ill-formed', () => {
+      const api = {
+        "noop": {
+          handler: a => {},
+          args: {
+            'a': {
+              foo: 'bar',
+            }
+          },
+        },
+      };
+      expect(() => apiMethods.model(api)).to.throw();
+    });
+
+    it('should reject a method with no handler', () => {
+      const api = {
+        "method": {},
+      };
+      expect(() => apiMethods.model(api)).to.throw();
+    });
+  });
+
+  describe('results', () => {
+    it('should accept an API with no endpoints', () => {
+      const model = apiMethods.model({});
+      expect(model).to.be.an('array').that.is.empty;
+    });
+
     it('should produce an endpoint metadata array', () => {
       const add = (a, b) => a + b;
       const api = {
@@ -54,12 +93,10 @@ describe('model', () => {
           handler: add,
           args: {
             a: {
-              type: Number,
-              required: true,
+              parse: Number,
             },
             b: {
-              type: Number,
-              required: true,
+              parse: Number,
             },
           },
         },
@@ -71,7 +108,7 @@ describe('model', () => {
   });
 
   describe('options', () => {
-    it('use route prefix', () => {
+    it('should use route prefix', () => {
       const fn = () => {};
       const api = {
         "noop": {
