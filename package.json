@@ -4,7 +4,7 @@
   "description": "Framework for easily creating and exposing APIs as methods",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha",
+    "test": "nyc mocha",
     "test:debug": "mocha --debug-brk"
   },
   "repository": {
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "chai": "^4.0.2",
-    "mocha": "^3.4.2"
+    "mocha": "^3.4.2",
+    "nyc": "^11.0.2"
   }
 }
