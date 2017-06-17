@@ -3,8 +3,16 @@
 const expect = require('chai').expect;
 const apiMethods = require('..');
 
-describe('API', () => {
-  describe('Methods', () => {
+function validate(model) {
+  model.forEach(method => {
+    expect(method).to.be.an('object').that.has.all.keys('route', 'handle');
+    expect(method.route).to.be.a('string');
+    expect(method.handle).to.be.a('function');
+  });
+}
+
+describe('model', () => {
+  describe('types', () => {
     it('should reject if API is not an object', () => {
       expect(() => apiMethods.model()).to.throw();
       expect(() => apiMethods.model(null)).to.throw();
@@ -41,13 +49,8 @@ describe('API', () => {
         },
       };
       const model = apiMethods.model(api);
-      expect(model).to.deep.equal([
-        {
-          args: [ 'a', 'b' ],
-          route: `/numbers.add`,
-          method: api['numbers.add'],
-        },
-      ]);
+      expect(model).to.be.an('array').that.has.lengthOf(1);
+      validate(model);
     });
   });
 });
