@@ -188,7 +188,7 @@ Each object will contain the following properties:
 | Property              | Description                                                               |
 |:---                   |:---                                                                       |
 |`name`                 | The name of the method. This is the same as the key in the API object.    |
-|`handle`               | A function used to execute the method handler. See [The `handle` function]() below.   |
+|`handle`               | A function used to execute the method handler. See [The `handle` function](#the-handle-function) below.   |
 
 ### The `handle` function
 
