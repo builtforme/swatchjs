@@ -4,7 +4,7 @@ const expect = require('chai').expect;
 const apiMethods = require('..');
 
 describe('index', () => {
-  it('should contain a load function', () => {
-    expect(apiMethods.load).to.be.a('function');
+  it('should be a function that creates the API model', () => {
+    expect(apiMethods).to.be.a('function');
   });
 });

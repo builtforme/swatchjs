@@ -2,6 +2,4 @@
 
 const load = require('./lib/load');
 
-module.exports = {
-  load,
-};
+module.exports = load;
