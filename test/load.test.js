@@ -5,8 +5,8 @@ const load = require('../lib/load');
 
 function validate(model) {
   model.forEach(method => {
-    expect(method).to.be.an('object').that.has.all.keys('route', 'handle');
-    expect(method.route).to.be.a('string');
+    expect(method).to.be.an('object').that.has.all.keys('name', 'handle');
+    expect(method.name).to.be.a('string');
     expect(method.handle).to.be.a('function');
   });
 }
@@ -113,26 +113,6 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
-    });
-  });
-
-  describe('options', () => {
-    it('should use route prefix', () => {
-      const fn = () => {};
-      const api = {
-        "noop": {
-          handler: fn,
-        },
-      };
-      const options = {
-        prefix: 'foo',
-      };
-
-      const modelWithoutOptions = load(api);
-      expect(modelWithoutOptions[0].route).to.equal('/noop');
-
-      const modelWithOptions = load(api, options);
-      expect(modelWithOptions[0].route).to.equal('/foo/noop');
     });
   });
 });
