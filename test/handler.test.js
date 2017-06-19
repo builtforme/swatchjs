@@ -67,11 +67,11 @@ describe('handler', () => {
     });
 
     it('should throw if all required parameters were not passed', () => {
-      expect(() => handle({a: 1})).to.throw();
+      expect(() => handle({a: 1})).to.throw('missing_arg');
     });
 
     it('should throw if a parameter passed was not expected', () => {
-      expect(() => handle({a: 1, b: 2, c: 3})).to.throw();
+      expect(() => handle({a: 1, b: 2, c: 3})).to.throw('invalid_arg_name');
     });
 
     it('should invoke the handler if all required arguments were passed', () => {
