@@ -86,6 +86,15 @@ describe('model', () => {
       expect(model).to.be.an('array').that.is.empty;
     });
 
+    it('should accept the shorthand form of method description', () => {
+      const api = {
+        "numbers.add": (a, b) => a + b,
+      };
+      const model = load(api);
+      expect(model).to.be.an('array').that.has.lengthOf(1);
+      validate(model);
+    });
+
     it('should produce an endpoint metadata array', () => {
       const add = (a, b) => a + b;
       const api = {
