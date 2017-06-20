@@ -1,5 +1,5 @@
 {
-  "name": "api-methods",
+  "name": "swatchjs",
   "version": "0.1.0",
   "description": "Framework for easily creating and exposing APIs as methods",
   "main": "lib/index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/builtforme/api-methods.git"
+    "url": "git+https://github.com/builtforme/swatchjs.git"
   },
   "keywords": [
     "framework",
@@ -19,9 +19,9 @@
   "author": "Built For Me",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/builtforme/api-methods/issues"
+    "url": "https://github.com/builtforme/swatchjs/issues"
   },
-  "homepage": "https://github.com/builtforme/api-methods#readme",
+  "homepage": "https://github.com/builtforme/swatchjs#readme",
   "dependencies": {
     "function-arguments": "^1.0.8",
     "joi": "^10.5.2"

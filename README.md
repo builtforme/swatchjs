@@ -1,4 +1,4 @@
-# api-methods
+# swatchjs
 
 A framework for easily creating and exposing APIs as methods.
 
@@ -37,9 +37,9 @@ The following creates a simple API which takes 2 parameters (`a` and `b`) and
 returns their sum (`add` method) or difference (`sub` method).
 
 ```javascript
-const apiMethods = require('api-methods');
+const swatch = require('swatchjs');
 
-const model = apiMethods({
+const model = swatch({
     add: (a, b) => a + b,
     sub: (a, b) => a - b,
 });
@@ -51,16 +51,17 @@ code for the application or transport layer. KISS.
 
 ## API reference
 
-### The `apiMethods` function
+### The `swatch` function
 
 ```javascript
-const apiMethods = require('api-methods');
-const model = apiMethods({
+const swatch = require('swatchjs');
+
+const model = swatch({
     // api
 });
 ```
 
-Loading this library will result in a function  (`apiMethods` in the example
+Loading this library will result in a function  (`swatch` in the example
 above) which when called will produce a model for the API. This model can then
 be passed to adapters to expose that API. See
 [Exposing the API](#exposing-the-api) below for more details.
@@ -97,7 +98,7 @@ function createUser(username, password) {
     // ...
 }
 
-const model = apiMethods({
+const model = swatch({
     "users.create": createUser,
 });
 ```
@@ -114,7 +115,7 @@ function createUser(username, password) {
     // ...
 }
 
-const model = apiMethods({
+const model = swatch({
     "users.create": {
         handler: createUser,
         args: {
@@ -154,30 +155,30 @@ handler):
 
 ## Exposing the API
 
-The API model created by invoking the `apiMethods` function can be passed to any
+The API model created by invoking the `swatch` function can be passed to any
 adapter (pre-existing or customized) to expose that API.
 
 For instance, to expose the API using the popular `express` framework, the
-`api-methods-express` adapter (installed separately) can be used as in the
+`swatchjs-express` adapter (installed separately) can be used as in the
 example below. Please consult the documentation for that package for more
 details on how to use it.
 
 ```javascript
-const apiMethods = require('api-methods');
-const apiMethodsExpress = require('api-methods-express');
+const swatch = require('swatchjs');
+const swatchExpress = require('swatchjs-express');
 
 // create model
-const model = apiMethods({
+const model = swatch({
     // api
 });
 
 const app = express();
-apiMethodsExpress(app, model);
+swatchExpress(app, model);
 ```
 
 ## Creating a custom adapter
 
-The `apiMethods` function returns an array of objects, where each object
+The `swatch` function returns an array of objects, where each object
 contains metadata about the API. The length of the array will be equal to the
 number of methods in the API. The order in which each method appears in the
 array is not guaranteed to be the same as the order they were declared in the
@@ -210,7 +211,7 @@ function findFlight(from, to) {
     // ...
 }
 
-const model = apiMethods({
+const model = swatch({
     "flights.find": findFlight,
 });
 
