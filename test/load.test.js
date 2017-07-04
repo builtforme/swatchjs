@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const load = require('../lib/load');
+const load = require('../lib/loader');
 
 function validate(model) {
   model.forEach(method => {
