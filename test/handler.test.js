@@ -109,4 +109,29 @@ describe('handler', () => {
       expect(result).to.equal('hello');
     });
   });
+
+  describe('call time (convert parameter case)', () => {
+    // Handler functions define args in camel case
+    const fn = (argOne, argTwo) => {
+      expect(argOne).to.equal(1);
+      expect(argTwo).to.equal(2);
+
+      return argOne + argTwo;
+    };
+
+    // Method schema defines args in snake case
+    const method = {
+      handler: fn,
+      args: {
+        arg_one: {
+          parse: Number,
+        },
+        arg_two: {
+          parse: Number,
+        },
+      },
+    };
+    const result = handler(method)({argOne: 1, argTwo: 2});
+    expect(result).to.equal(3);
+  });
 });
