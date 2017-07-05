@@ -209,18 +209,34 @@ The `handle` function takes only 1 parameter, which is an object containing the
 values for all parameters. As expected it, it validates that all required
 arguments are present, and that no unknown argument was passed.
 
+Note that by default, args defined in the API schema should be `snake_case`, 
+while the matching args in the handler function should be `camelCase`. See above
+for how to override this default mapping behavior with `options.argNameMapFn`.
+
 For example:
 
 ```javascript
 //
 // In the user code
 //
-function findFlight(from, to) {
+function findFlight(fromCode, toCode) {
     // ...
 }
 
 const model = swatch({
-    "flights.find": findFlight,
+    "flights.find": {
+        handler: findFlight,
+        args: {
+            from_code: {
+                parse: String,
+                optional: false
+            },
+            to_code: {
+                parse: String,
+                optional: false
+            }
+        }
+    }
 });
 
 yourAdapter(model);
@@ -233,8 +249,8 @@ yourAdapter(model);
 
 // At some point, you will call this:
 method.handle({
-    from: 'JFK',
-    to: 'LAX',
+    fromCode: 'JFK',
+    toCode: 'LAX',
 });
 // And internally, the handle function will then call this:
 findFlight('FJK', 'LAX');
