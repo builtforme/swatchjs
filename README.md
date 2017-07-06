@@ -147,7 +147,7 @@ The following properties can be set:
 |`args`                 | No        | Arguments information.                            |
 |`args[key]`            | Yes       | The parameter name. Must exist in the handler.    |
 |`args[key].parse`      | No        | A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.    |
-|`args[key].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. If present, should return desired value, or throw.    |
+|`args[key].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.    |
 |`args[key].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.         |
 
 ## Runtime errors
