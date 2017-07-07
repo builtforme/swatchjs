@@ -163,6 +163,39 @@ describe('handler', () => {
     expect(result).to.equal(3);
   });
 
+  describe('call time (parse arguments)', () => {
+    // Handler function just ensures the input args are correct
+    const fn = (argNum) => {
+      return argNum;
+    };
+
+    // Handle corner cases of parsing and coercing falsy values
+    const method = {
+      handler: fn,
+      args: {
+        argNum: {
+          parse: (v) => {
+            if (v === 0) {
+              return false;
+            }
+            return true;
+          },
+        },
+      },
+    };
+    const resultZero = handler(method)({argNum: 0});
+    expect(resultZero).to.equal(false);
+
+    const resultUndefined = handler(method)({argNum: null});
+    expect(resultUndefined).to.equal(true);
+
+    const resultFalse = handler(method)({argNum: false});
+    expect(resultFalse).to.equal(true);
+
+    const resultNumber = handler(method)({argNum: 1});
+    expect(resultNumber).to.equal(true);
+  });
+
   describe('call time (validate arguments)', () => {
     // Handler function doesnt do anything special
     const fn = (arg) => {
