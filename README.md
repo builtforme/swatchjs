@@ -87,6 +87,13 @@ Each method name is associated with a handler. The handler can be the function
 which will handle the API method call, or it can be an object that provides a
 little more flexibility in describing the function.
 
+This function may also take a second `options` object to help with configuration.
+Currently this parameter supports the following fields:
+
+| Property         | Description          | Default Behavior                |
+|:---              |:---                  |:---                             |
+|`argNameMapFn`    | Function - Map args from JSON schema to handler fn  | Maps snake_case to camelCase      |
+
 ### Handling each API method (the easy way)
 
 The easiest way to expose an API method is to just associate the method name
@@ -139,7 +146,8 @@ The following properties can be set:
 |`handler`              | Yes       | The API handler. Must be a function.              |
 |`args`                 | No        | Arguments information.                            |
 |`args[key]`            | Yes       | The parameter name. Must exist in the handler.    |
-|`args[key].parse`      | No        | A function that will be executed on the input. Can be used to perform type coercions or validation. If present, should return desired value, or throw.    |
+|`args[key].parse`      | No        | A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.    |
+|`args[key].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.    |
 |`args[key].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.         |
 
 ## Runtime errors
@@ -201,18 +209,34 @@ The `handle` function takes only 1 parameter, which is an object containing the
 values for all parameters. As expected it, it validates that all required
 arguments are present, and that no unknown argument was passed.
 
+Note that by default, args defined in the API schema should be `snake_case`, 
+while the matching args in the handler function should be `camelCase`. See above
+for how to override this default mapping behavior with `options.argNameMapFn`.
+
 For example:
 
 ```javascript
 //
 // In the user code
 //
-function findFlight(from, to) {
+function findFlight(fromCode, toCode) {
     // ...
 }
 
 const model = swatch({
-    "flights.find": findFlight,
+    "flights.find": {
+        handler: findFlight,
+        args: {
+            from_code: {
+                parse: String,
+                optional: false
+            },
+            to_code: {
+                parse: String,
+                optional: false
+            }
+        }
+    }
 });
 
 yourAdapter(model);
@@ -225,8 +249,8 @@ yourAdapter(model);
 
 // At some point, you will call this:
 method.handle({
-    from: 'JFK',
-    to: 'LAX',
+    fromCode: 'JFK',
+    toCode: 'LAX',
 });
 // And internally, the handle function will then call this:
 findFlight('FJK', 'LAX');
