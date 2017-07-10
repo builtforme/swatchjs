@@ -31,5 +31,9 @@
     "chai": "^4.0.2",
     "mocha": "^3.4.2",
     "nyc": "^11.0.2"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
   }
 }
