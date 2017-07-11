@@ -110,59 +110,6 @@ describe('handler', () => {
     });
   });
 
-  describe('call time (convert parameter case)', () => {
-    // Handler functions define args in camel case
-    const fn = (argOne, argTwo) => {
-      expect(argOne).to.equal(1);
-      expect(argTwo).to.equal(2);
-
-      return argOne + argTwo;
-    };
-
-    // Method schema defines args in snake case
-    const method = {
-      handler: fn,
-      args: {
-        arg_one: {
-          parse: Number,
-        },
-        arg_two: {
-          parse: Number,
-        },
-      },
-    };
-    const result = handler(method)({argOne: 1, argTwo: 2});
-    expect(result).to.equal(3);
-  });
-
-  describe('call time (custom argument name mapping)', () => {
-    // Handler functions define args in snake case, and we pass a
-    //  custom name adapter that makes no change and expects snake case
-    const noopName = (arg) => { return arg; };
-    const fn = (arg_one, arg_two) => {
-      expect(arg_one).to.equal(1);
-      expect(arg_two).to.equal(2);
-
-      return arg_one + arg_two;
-    };
-
-    // Method schema defines args in snake case
-    const method = {
-      handler: fn,
-      args: {
-        arg_one: {
-          parse: Number,
-        },
-        arg_two: {
-          parse: Number,
-        },
-      },
-    };
-    const options = { argNameMapFn: noopName };
-    const result = handler(method, options)({arg_one: 1, arg_two: 2});
-    expect(result).to.equal(3);
-  });
-
   describe('call time (parse arguments)', () => {
     // Handler function just ensures the input args are correct
     const fn = (argNum) => {
