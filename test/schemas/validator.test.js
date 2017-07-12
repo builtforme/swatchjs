@@ -17,18 +17,32 @@ describe('validator', () => {
       const api = {
         fn: {
           handler: (arg_1, arg_2) => { arg_1 + arg_2 },
-          args: {
-            arg_1: {
+          args: [
+            {
+              name: 'arg_1',
               parse: Number,
               validate: validateArg1,
               optional: false,
             },
-            arg_2: {
+            {
+              name: 'arg_2',
               parse: Number,
               validate: validateArg2,
               optional: true,
             },
-          },
+          ],
+        },
+      };
+      const validatedApi = validate(api);
+
+      expect(validatedApi).to.deep.equal(api);
+    });
+
+    it('should allow a valid schema', () => {
+      const api = {
+        fn: {
+          handler: (a, b) => { a + b },
+          args: [ 'a', 'b' ],
         },
       };
       const validatedApi = validate(api);
@@ -62,12 +76,12 @@ describe('validator', () => {
     it('should throw on invalid function schemas', () => {
       const missingHandler = {
         fn: {
-          args: {
-            arg_1: {
+          args: [
+            {
               parse: Number,
               validate: validateArg1,
             },
-          },
+          ],
         },
       };
       expect(() => validate(missingHandler)).to.throw();
@@ -75,12 +89,13 @@ describe('validator', () => {
       const unexpectedVars = {
         fn: {
           handler: (arg_1) => { arg_1 },
-          args: {
-            arg_1: {
+          args: [
+            {
+              name: 'arg_1',
               parse: Number,
               validate: validateArg1,
             },
-          },
+          ],
           somethingElse: {},
         },
       };
@@ -100,27 +115,55 @@ describe('validator', () => {
       const extraArgParam = {
         fn: {
           handler: (arg_1) => { arg_1 },
-          args: {
-            arg_1: {
+          args: [
+            {
+              name: 'arg_1',
               parse: Number,
               validate: validateArg1,
               somethingElse: true,
             },
-          },
+          ],
         },
       };
       expect(() => validate(extraArgParam)).to.throw();
 
+      const invalidArgName = {
+        fn: {
+          handler: (arg_1) => { arg_1 },
+          args: [
+            {
+              name: '_name-invalid_',
+              parse: Number,
+            },
+          ],
+        },
+      };
+      expect(() => validate(invalidArgName)).to.throw();
+
+      const invalidArgParam = {
+        fn: {
+          handler: (arg_1) => { arg_1 },
+          args: [
+            {
+              name: '_name-invalid_',
+              parse: Number,
+            },
+            true,
+          ],
+        },
+      };
+      expect(() => validate(invalidArgParam)).to.throw();
+
       const invalidParseFn = {
         fn: {
           handler: (arg_1) => { arg_1 },
-          args: {
-            arg_1: {
+          args: [
+            {
               parse: 'number',
               validate: validateArg1,
               optional: true,
             },
-          },
+          ],
         },
       };
       expect(() => validate(invalidParseFn)).to.throw();
@@ -128,13 +171,13 @@ describe('validator', () => {
       const invalidValidateFn = {
         fn: {
           handler: (arg_1) => { arg_1 },
-          args: {
-            arg_1: {
+          args: [
+            {
               parse: Number,
               validate: false,
               optional: false,
             },
-          },
+          ],
         },
       };
       expect(() => validate(invalidValidateFn)).to.throw();
@@ -142,13 +185,14 @@ describe('validator', () => {
       const invalidOptionalParam = {
         fn: {
           handler: (arg_1) => { arg_1 },
-          args: {
-            arg_1: {
+          args: [
+            {
+              name: 'arg_1',
               parse: Number,
               validate: validateArg1,
               optional: String,
             },
-          },
+          ],
         },
       };
       expect(() => validate(invalidOptionalParam)).to.throw();

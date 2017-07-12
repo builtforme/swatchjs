@@ -5,29 +5,36 @@ const handler = require('../lib/handler');
 
 describe('handler', () => {
   describe('load time', () => {
-    it('should throw if one of the args is not a parameter in the handler', () => {
-      const api = {
-        handler: (a, b) => {},
-        args: {
-          a: {},
-          c: {},
-        },
+    it ('should throw if args are provided and arity doesnt match', () => {
+      const threeFn = (a, b, c) => {};
+      const threeMethod = {
+        handler: threeFn,
+        args: [ 'a', 'b' ],
       };
-      expect(() => handler(api)).to.throw();
+      expect(() => handler(threeMethod)).to.throw('invalid_arg_list');
+
+      const zeroFn = () => {};
+      const zeroMethod = {
+        handler: zeroFn,
+        args: [ 'a' ],
+      };
+      expect(() => handler(zeroMethod)).to.throw('invalid_arg_list');
     });
   });
 
-  describe('call time (args options explictly passed)', () => {
+  describe('call time (args options explictly passed with names)', () => {
     const handle = handler({
       handler: (a, b) => a + b,
-      args: {
-        a: {
+      args: [
+        {
+          name: 'a',
           parse: Number,
         },
-        b: {
+        {
+          name: 'b',
           parse: Number,
         },
-      },
+      ],
     });
 
     it('should throw if all required parameters were not passed', () => {
@@ -47,16 +54,124 @@ describe('handler', () => {
       };
       const method = {
         handler: fn,
-        args: {
-          a: {
+        args: [
+          {
+            name: 'a',
             parse: Number,
           },
-          b: {
+          {
+            name: 'b',
             parse: Number,
           },
-        },
+        ],
       };
       const result = handler(method)({a: 1, b: 2});
+      expect(result).to.equal(3);
+    });
+
+    it('should use method arg names when provided', () => {
+      const api = {
+        handler: (a, b) => {},
+        args: [
+          { name: 'a' },
+          { name: 'c' }
+        ],
+      };
+      expect(() => handler(api)({a: '.', b: '.'})).to.throw();
+      expect(() => handler(api)({a: '.', c: '.'})).not.to.throw();
+    });
+  });
+
+  describe('call time (args explictly passed as strings)', () => {
+    const handle = handler({
+      handler: (a, b, c) => a + b + c,
+      args: [ 'x', 'y', 'z' ],
+    });
+
+    it('should throw if all required parameters were not passed', () => {
+      expect(() => handle({x: '1'})).to.throw('missing_arg');
+    });
+
+    it('should throw if a parameter passed was not expected', () => {
+      expect(() => handle({w: '0', x: '1', y: '2', z: '3'})).to.throw('invalid_arg_name');
+    });
+
+    it('should invoke the handler if all required arguments were passed', () => {
+      // Handler function is defined with local parameters `a, b, c`
+      const fn = (a, b, c) => {
+        expect(a).to.equal('1');
+        expect(b).to.equal('2');
+        expect(c).to.equal('3');
+
+        return a + b + c;
+      };
+      // API is defined for external callers to use arguments `x, y, z`
+      const method = {
+        handler: fn,
+        args: [ 'x', 'y', 'z' ],
+      };
+      const result = handler(method)({z: '3', y: '2', x: '1'});
+      expect(result).to.equal('123');
+    });
+
+    it('should invoke the handler if all arguments are a mix of objects and strings', () => {
+      // Handler function is defined with local parameters `a, b, c`
+      const fn = (a, b, c) => {
+        expect(a).to.equal('1');
+        expect(b).to.equal('2');
+        expect(c).to.equal('3');
+
+        return a + b + c;
+      };
+      // API is defined for external callers to use arguments `y, x, c`
+      const method = {
+        handler: fn,
+        args: [
+          { name: 'y' },
+          'x',
+          { parse: String }
+        ],
+      };
+      const result = handler(method)({c: '3', x: '2', y: '1'});
+      expect(result).to.equal('123');
+
+      expect(() => handler(method)({a: '1', b: '2', c: '3'})).to.throw('invalid_arg_name');
+      expect(() => handler(method)({x: '1', y: '2', z: '3'})).to.throw('invalid_arg_name');
+    });
+  });
+
+  describe('call time (args options explictly passed without names)', () => {
+    const handle = handler({
+      handler: (a, b) => a + b,
+      args: [
+        { parse: Number },
+        { parse: Number },
+      ],
+    });
+
+    it('should throw if all required parameters were not passed', () => {
+      expect(() => handle({a: 1})).to.throw('missing_arg');
+    });
+
+    it('should throw if a parameter passed was not expected', () => {
+      expect(() => handle({a: 1, b: 2, c: 3})).to.throw('invalid_arg_name');
+    });
+
+    it('should invoke the handler if all required arguments were passed', () => {
+      const fn = (a, b) => {
+        expect(a).to.equal(1);
+        expect(b).to.equal(2);
+
+        return a + b;
+      };
+      const method = {
+        handler: fn,
+        args: [
+          { parse: Number },
+          { parse: Number },
+        ],
+      };
+      const result = handler(method)({b: 2, a: 1});
       expect(result).to.equal(3);
     });
   });
@@ -92,11 +207,12 @@ describe('handler', () => {
   describe('call time (optional parameters)', () => {
     const handle = handler({
       handler: a => a,
-      args: {
-        a: {
+      args: [
+        {
+          name: 'a',
           optional: true,
-        }
-      }
+        },
+      ]
     });
 
     it('should invoke the handler if optional arguments were omitted', () => {
@@ -110,59 +226,6 @@ describe('handler', () => {
     });
   });
 
-  describe('call time (convert parameter case)', () => {
-    // Handler functions define args in camel case
-    const fn = (argOne, argTwo) => {
-      expect(argOne).to.equal(1);
-      expect(argTwo).to.equal(2);
-
-      return argOne + argTwo;
-    };
-
-    // Method schema defines args in snake case
-    const method = {
-      handler: fn,
-      args: {
-        arg_one: {
-          parse: Number,
-        },
-        arg_two: {
-          parse: Number,
-        },
-      },
-    };
-    const result = handler(method)({argOne: 1, argTwo: 2});
-    expect(result).to.equal(3);
-  });
-
-  describe('call time (custom argument name mapping)', () => {
-    // Handler functions define args in snake case, and we pass a
-    //  custom name adapter that makes no change and expects snake case
-    const noopName = (arg) => { return arg; };
-    const fn = (arg_one, arg_two) => {
-      expect(arg_one).to.equal(1);
-      expect(arg_two).to.equal(2);
-
-      return arg_one + arg_two;
-    };
-
-    // Method schema defines args in snake case
-    const method = {
-      handler: fn,
-      args: {
-        arg_one: {
-          parse: Number,
-        },
-        arg_two: {
-          parse: Number,
-        },
-      },
-    };
-    const options = { argNameMapFn: noopName };
-    const result = handler(method, options)({arg_one: 1, arg_two: 2});
-    expect(result).to.equal(3);
-  });
-
   describe('call time (parse arguments)', () => {
     // Handler function just ensures the input args are correct
     const fn = (argNum) => {
@@ -172,8 +235,9 @@ describe('handler', () => {
     // Handle corner cases of parsing and coercing falsy values
     const method = {
       handler: fn,
-      args: {
-        argNum: {
+      args: [
+        {
+          name: 'argNum',
           parse: (v) => {
             if (v === 0) {
               return false;
@@ -181,7 +245,7 @@ describe('handler', () => {
             return true;
           },
         },
-      },
+      ],
     };
     const resultZero = handler(method)({argNum: 0});
     expect(resultZero).to.equal(false);
@@ -206,8 +270,8 @@ describe('handler', () => {
     //  that will throw if the arg is a negative number
     const method = {
       handler: fn,
-      args: {
-        arg: {
+      args: [
+        {
           parse: Number,
           validate: (a) => {
             if (a < 0) {
@@ -215,7 +279,7 @@ describe('handler', () => {
             }
           }
         },
-      },
+      ],
     };
     expect(() => handler(method)({arg: -1})).to.throw('negative_number');
   });

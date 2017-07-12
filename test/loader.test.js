@@ -26,6 +26,13 @@ describe('model', () => {
       expect(() => load({'foo':'bar'})).to.throw();
     });
 
+    it('should reject a method with no handler', () => {
+      const api = {
+        "method": {},
+      };
+      expect(() => load(api)).to.throw();
+    });
+
     it('should reject if handler is not a function', () => {
       const api = {
         "noop": {
@@ -35,7 +42,7 @@ describe('model', () => {
       expect(() => load(api)).to.throw();
     });
 
-    it('should reject if args is not an object', () => {
+    it('should reject if args is not an array', () => {
       const api = {
         "noop": {
           handler: () => {},
@@ -45,36 +52,22 @@ describe('model', () => {
       expect(() => load(api)).to.throw();
     });
 
-    it('should reject if one of the args is not a parameter in the handler', () => {
+    it('should reject if args list is smaller than the function definition', () => {
       const api = {
         "noop": {
           handler: (a, b) => {},
-          args: {
-            a: {},
-            c: {},
-          },
+          args: [ 'a' ],
         },
       };
       expect(() => load(api)).to.throw();
     });
 
-    it('should reject if args is ill-formed', () => {
+    it('should reject if args list is larger than the function definition', () => {
       const api = {
         "noop": {
-          handler: a => {},
-          args: {
-            'a': {
-              foo: 'bar',
-            }
-          },
+          handler: (a, b) => {},
+          args: [ 'a', 'b', 'c' ],
         },
-      };
-      expect(() => load(api)).to.throw();
-    });
-
-    it('should reject a method with no handler', () => {
-      const api = {
-        "method": {},
       };
       expect(() => load(api)).to.throw();
     });
@@ -95,19 +88,50 @@ describe('model', () => {
       validate(model);
     });
 
+    it('should accept an endpoint with only named arguments', () => {
+      const add = (a, b) => a + b;
+      const api = {
+        "strings.add": {
+          handler: add,
+          args: [ 'a', 'b' ],
+        },
+      };
+      const model = load(api);
+      expect(model).to.be.an('array').that.has.lengthOf(1);
+      validate(model);
+    });
+
+    it('should accept an endpoint with an unnamed argument array', () => {
+      const add = (a, b) => a + b;
+      const api = {
+        "numbers.add": {
+          handler: add,
+          args: [
+            { parse: Number },
+            { parse: Number },
+          ],
+        },
+      };
+      const model = load(api);
+      expect(model).to.be.an('array').that.has.lengthOf(1);
+      validate(model);
+    });
+
     it('should produce an endpoint metadata array', () => {
       const add = (a, b) => a + b;
       const api = {
         "numbers.add": {
           handler: add,
-          args: {
-            a: {
+          args: [
+            {
+              name: 'a',
               parse: Number,
             },
-            b: {
+            {
+              name: 'b',
               parse: Number,
             },
-          },
+          ],
         },
       };
       const model = load(api);
