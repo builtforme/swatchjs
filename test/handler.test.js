@@ -113,6 +113,31 @@ describe('handler', () => {
       const result = handler(method)({z: '3', y: '2', x: '1'});
       expect(result).to.equal('123');
     });
+
+    it('should invoke the handler if all arguments are a mix of objects and strings', () => {
+      // Handler function is defined with local parameters `a, b, c`
+      const fn = (a, b, c) => {
+        expect(a).to.equal('1');
+        expect(b).to.equal('2');
+        expect(c).to.equal('3');
+
+        return a + b + c;
+      };
+      // API is defined for external callers to use arguments `y, x, c`
+      const method = {
+        handler: fn,
+        args: [
+          { name: 'y' },
+          'x',
+          { parse: String }
+        ],
+      };
+      const result = handler(method)({c: '3', x: '2', y: '1'});
+      expect(result).to.equal('123');
+
+      expect(() => handler(method)({a: '1', b: '2', c: '3'})).to.throw('invalid_arg_name');
+      expect(() => handler(method)({x: '1', y: '2', z: '3'})).to.throw('invalid_arg_name');
+    });
   });
 
   describe('call time (args options explictly passed without names)', () => {
