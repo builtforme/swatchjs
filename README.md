@@ -87,6 +87,14 @@ Each method name is associated with a handler. The handler can be the function
 which will handle the API method call, or it can be an object that provides a
 little more flexibility in describing the function.
 
+### Declaration-time errors
+The following errors will be generated when the API is declared:
+
+| Error             | Description   |
+|:---               |:---           |
+|`invalid_arg_list` | One or more of the provided method `args` lists did not match the handler function. |
+
+
 ### Handling each API method (the easy way)
 
 The easiest way to expose an API method is to just associate the method name
@@ -151,8 +159,7 @@ The following properties can be set:
 
 ## Runtime errors
 
-The following errors will be generated during runtime (when invoking the
-handler):
+The following errors will be generated during runtime (when invoking the handler):
 
 | Error             | Description   |
 |:---               |:---           |

@@ -1,5 +1,5 @@
 {
-  "name": "swatchjs",
+  "name": "@builtforme/swatchjs",
   "version": "0.1.0",
   "description": "Framework for easily creating and exposing APIs as methods",
   "main": "lib/index.js",
