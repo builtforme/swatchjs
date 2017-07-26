@@ -34,9 +34,9 @@ describe('validator', () => {
             },
           ],
           middleware: [
-            (ctx, auth) => { ctx },
-            (ctx, auth) => { auth },
-            (ctx, auth) => { true },
+            (ctx, next) => { ctx },
+            (ctx, next) => { next },
+            (ctx, next) => { true },
           ],
         },
       };
@@ -219,7 +219,7 @@ describe('validator', () => {
       const functionMiddlewareHandler = {
         fn: {
           handler: (arg_1) => { arg_1 },
-          middleware: (ctx) => { ctx },
+          middleware: (ctx, next) => { ctx },
         },
       };
       expect(() => validate(functionMiddlewareHandler)).to.throw();
@@ -235,7 +235,7 @@ describe('validator', () => {
       const mixedArrayMiddlewareHandler = {
         fn: {
           handler: (arg_1) => { arg_1 },
-          middleware: [1, true, (ctx, auth) => { auth }, (ctx, auth) => { ctx }],
+          middleware: [1, true, (ctx, next) => { ctx }, (ctx, next) => { ctx }],
         },
       };
       expect(() => validate(mixedArrayMiddlewareHandler)).to.throw();

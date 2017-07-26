@@ -78,7 +78,7 @@ describe('model', () => {
         "noop": {
           handler: (a, b) => {},
           args: ['a', 'b'],
-          middleware: [1, (ctx, auth) => {}],
+          middleware: [1, (ctx, next) => {}],
         }
       };
       expect(() => load(api)).to.throw();
@@ -158,8 +158,8 @@ describe('model', () => {
     it('should pass in middleware array', () => {
       const add = (a, b) => a + b;
       const middleware = [
-        (ctx, auth) => { return ctx },
-        (ctx, auth) => { return auth }
+        (ctx, next) => { return ctx },
+        (ctx, next) => { return next + 1 },
       ];
       const api = {
         "numbers.add": {
@@ -183,7 +183,7 @@ describe('model', () => {
 
       expect(model[0].middleware).to.be.an('array').that.has.lengthOf(2);
       expect(model[0].middleware[0](1, 2)).to.equal(1);
-      expect(model[0].middleware[1](1, 2)).to.equal(2);
+      expect(model[0].middleware[1](1, 2)).to.equal(3);
     });
   });
 });

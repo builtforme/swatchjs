@@ -123,7 +123,7 @@ function createUser(username, password, name) {
     // ...
 }
 
-function middlewareFn(ctx, auth) {
+function middlewareFn(ctx, next) {
     // ...
 }
 
@@ -170,7 +170,7 @@ The following properties can be set:
 |`args[idx].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.    |
 |`args[idx].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.         |
 |`args[idx].default`    | No        | A primitive type or object. If user fails to provide an optional argument, the default will be provided.         |
-|`middleware`           | No        | An array of functions to run as middleware. Accepts request context and auth context as params. Throw on error to abort request handler |
+|`middleware`           | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler |
 
 ## Runtime errors
 
