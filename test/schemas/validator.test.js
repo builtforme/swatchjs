@@ -23,7 +23,7 @@ describe('validator', () => {
               parse: Number,
               validate: validateArg1,
               optional: false,
-              default: () => { return 13; },
+              default: 3,
             },
             {
               name: 'arg_2',
