@@ -41,6 +41,10 @@ describe('handler', () => {
       expect(() => handle({a: 1})).to.throw('missing_arg');
     });
 
+    it('should throw if a required parameter was undefined', () => {
+      expect(() => handle({a: 1, b: undefined})).to.throw('missing_arg');
+    });
+
     it('should throw if a parameter passed was not expected', () => {
       expect(() => handle({a: 1, b: 2, c: 3})).to.throw('invalid_arg_name');
     });
@@ -247,6 +251,12 @@ describe('handler', () => {
         },
       ],
     };
+
+    // Framework should explicitly throw on missing or undefined values
+    expect(() => handler(method)({})).to.throw('missing_arg');
+    expect(() => handler(method)({argNum: undefined})).to.throw('missing_arg');
+
+    // Otherwise it should accept the values and run the parser
     const resultZero = handler(method)({argNum: 0});
     expect(resultZero).to.equal(false);
 
@@ -282,5 +292,86 @@ describe('handler', () => {
       ],
     };
     expect(() => handler(method)({arg: -1})).to.throw('negative_number');
+  });
+
+  describe('default values', () => {
+    it('should not use default values for required arguments', () => {
+      const fn = (a) => { return a };
+      const method = {
+        handler: fn,
+        args: [
+          {
+            name: 'a',
+            optional: false,
+            parse: Number,
+            default: 1,
+          },
+        ],
+      };
+      expect(handler(method)({a: 2})).to.equal(2);
+      expect(() => handler(method)({})).to.throw('missing_arg');
+    });
+
+    it('should use default values for optional argument when undefined', () => {
+      const fn = (a, b, c, d) => {
+        return {
+          a,
+          b,
+          c,
+          d,
+        };
+      };
+      const method = {
+        handler: fn,
+        args: [
+          {
+            name: 'a',
+            optional: true,
+            parse: Number,
+            default: 0,
+          },
+          {
+            name: 'b',
+            optional: true,
+            parse: Boolean,
+            default: false,
+          },
+          {
+            name: 'c',
+            optional: true,
+            default: [],
+          },
+          {
+            name: 'd',
+            optional: true,
+            parse: String,
+            default: '',
+          },
+        ],
+      };
+
+      function checkResult(result, a, b, c, d) {
+        expect(result.a).to.equal(a);
+        expect(result.b).to.equal(b);
+        expect(result.d).to.equal(d);
+
+        expect(result.c.length).to.equal(c.length);
+        result.c.forEach((val, idx) => {
+          expect(val).to.equal(c[idx]);
+        })
+      }
+
+      const r1 = handler(method)({});
+      checkResult(r1, 0, false, [], '');
+
+      const r2 = handler(method)({a: '100', b: true});
+      checkResult(r2, 100, true, [], '');
+
+      const r3 = handler(method)({b: false, c: [0]});
+      checkResult(r3, 0, false, [0], '');
+
+      const r4 = handler(method)({c: [], d: 'false'});
+      checkResult(r4, 0, false, [], 'false');
+    });
   });
 });

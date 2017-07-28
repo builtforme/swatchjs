@@ -102,7 +102,7 @@ with its function. When exposed, each of the parameters in the function will be
 arguments in the method.
 
 ```javascript
-function createUser(username, password) {
+function createUser(username, password, name) {
     // ...
 }
 
@@ -110,16 +110,16 @@ const model = swatch({
     "users.create": createUser,
 });
 ```
-In the example above, when invoking `users.create`, the user would pass in two
-arguments: `username` and `password`. The framework automatically matches the
-arguments passed in by the user to the function arguments.
+In the example above, when invoking `users.create`, the user would pass in three
+arguments: `username` `password`, and `name`. The framework automatically matches
+the arguments passed in by the user to the function arguments.
 
 ### Handling each API method (the more descriptive way)
 
 You can also optionally pass in an array, describing each argument separately:
 
 ```javascript
-function createUser(username, password) {
+function createUser(username, password, name) {
     // ...
 }
 
@@ -137,14 +137,22 @@ const model = swatch({
                 parse: String,
                 optional: false,
             },
+            {
+                name: 'name',
+                parse: String,
+                optional: true,
+                default: 'New User',
+            },
         ],
     },
 });
 ```
-In this scenario, when invoking `users.create`, the user would still pass in two
-arguments: `username` and `password`. The framework automatically matches the
-`username` value to the first argument and the `password` value to the second
-argument of the `createUser` function.
+In this scenario, when invoking `users.create`, the user would still pass in
+three arguments: `username`, `password`, and `name`. The framework automatically
+matches the `username` value to the first argument, the `password` value to the
+second argument, and `name` value to the third argument of the `createUser`
+function. Additionally, the `name` value is optional and will provide a default
+value of 'New User' if the argument is not present.
 
 The following properties can be set:
 
@@ -156,6 +164,7 @@ The following properties can be set:
 |`args[idx].parse`      | No        | A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.    |
 |`args[idx].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.    |
 |`args[idx].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.         |
+|`args[idx].optional`   | No        | A primitive type or object. If user fails to provide an optional argument, the default will be provided.         |
 
 ## Runtime errors
 
