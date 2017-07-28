@@ -5,9 +5,10 @@ const load = require('../lib/loader');
 
 function validate(model) {
   model.forEach(method => {
-    expect(method).to.be.an('object').that.has.all.keys('name', 'handle');
+    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'middleware');
     expect(method.name).to.be.a('string');
     expect(method.handle).to.be.a('function');
+    expect(method.middleware).to.be.an('array');
   });
 }
 
@@ -71,6 +72,17 @@ describe('model', () => {
       };
       expect(() => load(api)).to.throw();
     });
+
+    it('should reject if middleware is not a list of functions', () => {
+      const api = {
+        "noop": {
+          handler: (a, b) => {},
+          args: ['a', 'b'],
+          middleware: [1, (ctx, next) => {}],
+        }
+      };
+      expect(() => load(api)).to.throw();
+    });
   });
 
   describe('results', () => {
@@ -86,6 +98,7 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
+      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
     });
 
     it('should accept an endpoint with only named arguments', () => {
@@ -99,6 +112,7 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
+      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
     });
 
     it('should accept an endpoint with an unnamed argument array', () => {
@@ -115,6 +129,7 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
+      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
     });
 
     it('should produce an endpoint metadata array', () => {
@@ -137,6 +152,38 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
+      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
+    });
+
+    it('should pass in middleware array', () => {
+      const add = (a, b) => a + b;
+      const middleware = [
+        (ctx, next) => { return ctx },
+        (ctx, next) => { return next + 1 },
+      ];
+      const api = {
+        "numbers.add": {
+          handler: add,
+          args: [
+            {
+              name: 'a',
+              parse: Number,
+            },
+            {
+              name: 'b',
+              parse: Number,
+            },
+          ],
+          middleware: middleware,
+        }
+      };
+      const model = load(api);
+      expect(model).to.be.an('array').that.has.lengthOf(1);
+      validate(model);
+
+      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(2);
+      expect(model[0].middleware[0](1, 2)).to.equal(1);
+      expect(model[0].middleware[1](1, 2)).to.equal(3);
     });
   });
 });

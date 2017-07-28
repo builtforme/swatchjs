@@ -33,6 +33,11 @@ describe('validator', () => {
               default: 12,
             },
           ],
+          middleware: [
+            (ctx, next) => { ctx },
+            (ctx, next) => { next },
+            (ctx, next) => { true },
+          ],
         },
       };
       const validatedApi = validate(api);
@@ -200,6 +205,40 @@ describe('validator', () => {
         },
       };
       expect(() => validate(invalidOptionalParam)).to.throw();
+    });
+
+    it('should throw on invalid middleware definition', () => {
+      const numberMiddlewareHandler = {
+        fn: {
+          handler: (arg_1) => { arg_1 },
+          middleware: 100,
+        },
+      };
+      expect(() => validate(numberMiddlewareHandler)).to.throw();
+
+      const functionMiddlewareHandler = {
+        fn: {
+          handler: (arg_1) => { arg_1 },
+          middleware: (ctx, next) => { ctx },
+        },
+      };
+      expect(() => validate(functionMiddlewareHandler)).to.throw();
+
+      const numArrayMiddlewareHandler = {
+        fn: {
+          handler: (arg_1) => { arg_1 },
+          middleware: [1, 2, 3, 4, 5],
+        },
+      };
+      expect(() => validate(numArrayMiddlewareHandler)).to.throw();
+
+      const mixedArrayMiddlewareHandler = {
+        fn: {
+          handler: (arg_1) => { arg_1 },
+          middleware: [1, true, (ctx, next) => { ctx }, (ctx, next) => { ctx }],
+        },
+      };
+      expect(() => validate(mixedArrayMiddlewareHandler)).to.throw();
     });
   });
 });

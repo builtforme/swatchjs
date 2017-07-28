@@ -123,6 +123,10 @@ function createUser(username, password, name) {
     // ...
 }
 
+function middlewareFn(ctx, next) {
+    // ...
+}
+
 const model = swatch({
     "users.create": {
         handler: createUser,
@@ -144,6 +148,7 @@ const model = swatch({
                 default: 'New User',
             },
         ],
+        middleware: [middlewareFn],
     },
 });
 ```
@@ -164,7 +169,8 @@ The following properties can be set:
 |`args[idx].parse`      | No        | A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.    |
 |`args[idx].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.    |
 |`args[idx].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.         |
-|`args[idx].optional`   | No        | A primitive type or object. If user fails to provide an optional argument, the default will be provided.         |
+|`args[idx].default`    | No        | A primitive type or object. If user fails to provide an optional argument, the default will be provided.         |
+|`middleware`           | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler |
 
 ## Runtime errors
 
@@ -213,6 +219,7 @@ Each object will contain the following properties:
 |:---                   |:---                                                                       |
 |`name`                 | The name of the method. This is the same as the key in the API object.    |
 |`handle`               | A function used to execute the method handler. See [The `handle` function](#the-handle-function) below.   |
+|`middleware`           | An array of functions to execute as middleware before the method handler. |
 
 ### The `handle` function
 
