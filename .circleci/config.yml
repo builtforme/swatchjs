@@ -36,7 +36,7 @@ jobs:
       # run tests!
       - run: npm test
 
-  publish:
+  version:
     docker:
       # specify the version you desire here
       - image: circleci/node:7.10
@@ -57,6 +57,26 @@ jobs:
               git config --global user.name "Built For Me Automated Publisher"
               npm version patch
               git push --follow-tags
+            else
+              echo "Not versioning because branch is not master."
+            fi
+
+  publish:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:7.10
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - deploy:
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
               echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
               npm publish --access public
             else
@@ -68,6 +88,7 @@ workflows:
   build_tag_publish:
     jobs:
       - build
+          requires:
           filters:
             tags:
               ignore: /v[0-9]+(\.[0-9]+)*/
@@ -75,12 +96,11 @@ workflows:
           requires:
             - build
           filters:
-            branches:
-              only: master
+            tags:
+              ignore: /v[0-9]+(\.[0-9]+)*/
       - publish:
           requires:
             - build
-            - version
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)*/
+              ignore: /v[0-9]+(\.[0-9]+)*/
