@@ -43,9 +43,19 @@ jobs:
               git config --global user.email "npm@builtforme.tech"
               git config --global user.name "Built For Me Automated Publisher"
               npm version patch
-              git push
+              git push --follow-tags
               echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
               npm publish --access public
             else
               echo "Not publishing to npm because branch is not master."
             fi
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+        filters:
+          tags:
+            # Do not build tagged commits, since they were created by a previous build
+            ignore: /v[0-9]+(\.[0-9]+)*/
