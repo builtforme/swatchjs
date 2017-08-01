@@ -39,6 +39,7 @@ jobs:
       - deploy:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              git config --global push.default simple
               git config --global user.email "npm@builtforme.tech"
               git config --global user.name "Built For Me Automated Publisher"
               npm version patch
