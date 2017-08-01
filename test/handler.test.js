@@ -20,6 +20,62 @@ describe('handler', () => {
       };
       expect(() => handler(zeroMethod)).to.throw('invalid_arg_list');
     });
+
+    describe('defaults', () => {
+      it('should throw if arg.default and arg.validate are specified and the default does not validate', () => {
+        const oneFn = (a) => {};
+        const oneMethod = {
+          handler: oneFn,
+          args: [{
+            name: 'a',
+            parse: Number,
+            validate: (param) => { if (param === 0) throw new Error('validator puked on purpose') },
+            default: 0,
+          },],
+        };
+        expect(() => handler(oneMethod)).to.throw('invalid_default');
+      });
+
+      it('should not throw if the default does validate', () => {
+        const oneFn = (a) => {};
+        const oneMethod = {
+          handler: oneFn,
+          args: [{
+            name: 'a',
+            parse: Number,
+            validate: (param) => { if (param !== 0) throw new Error('validator puked on purpose') },
+            default: 0,
+          },],
+        };
+        expect(() => handler(oneMethod)).not.to.throw('invalid_default');
+      });
+
+      it('should not throw if arg.default is not specified', () => {
+        const oneFn = (a) => {};
+        const oneMethod = {
+          handler: oneFn,
+          args: [{
+            name: 'a',
+            parse: Number,
+            validate: (param) => { if (param === 0) throw new Error('validator puked on purpose') },
+          },],
+        };
+        expect(() => handler(oneMethod)).not.to.throw('invalid_default');
+      });
+
+      it('should not throw if arg.validate is not specified', () => {
+        const oneFn = (a) => {};
+        const oneMethod = {
+          handler: oneFn,
+          args: [{
+            name: 'a',
+            parse: Number,
+            default: 0,
+          },],
+        };
+        expect(() => handler(oneMethod)).not.to.throw('invalid_default');
+      });
+    });
   });
 
   describe('call time (args options explictly passed with names)', () => {
