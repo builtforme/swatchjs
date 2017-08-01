@@ -87,20 +87,20 @@ workflows:
   version: 2
   build_tag_publish:
     jobs:
-      - build
-          requires:
-          filters:
-            tags:
-              ignore: /v[0-9]+(\.[0-9]+)*/
-      - version
-          requires:
-            - build
-          filters:
-            tags:
-              ignore: /v[0-9]+(\.[0-9]+)*/
-      - publish:
-          requires:
-            - build
-          filters:
-            tags:
-              ignore: /v[0-9]+(\.[0-9]+)*/
+        - build:
+            requires:
+            filters:
+              tags:
+                ignore: /v[0-9]+(\.[0-9]+)*/
+        - version:
+            requires:
+              - build
+            filters:
+              tags:
+                ignore: /v[0-9]+(\.[0-9]+)*/
+        - publish:
+            requires:
+              - build
+            filters:
+              tags:
+                ignore: /v[0-9]+(\.[0-9]+)*/
