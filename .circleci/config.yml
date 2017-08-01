@@ -51,6 +51,7 @@ jobs:
       - checkout
       - deploy:
           command: |
+            echo $CIRCLE_TAG
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               git config --global push.default simple
               git config --global user.email "npm@builtforme.tech"
@@ -76,6 +77,7 @@ jobs:
       - checkout
       - deploy:
           command: |
+            echo $CIRCLE_TAG
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
               npm publish --access public
