@@ -35,3 +35,12 @@ jobs:
 
       # run tests!
       - run: npm test
+
+      - deploy:
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+              npm publish --access public
+            else
+              echo "Not publishing to npm because branch is not master."
+            fi
