@@ -97,10 +97,6 @@ workflows:
   build_tag_publish:
     jobs:
         - build
-        - version:
-            requires:
-              - build
         - publish:
             requires:
-              - version
               - build
