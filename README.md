@@ -95,7 +95,7 @@ The following errors will be generated when the API is declared:
 |`invalid_arg_list` | One or more of the provided method `args` lists did not match the handler function. |
 
 
-### Handling each API method (the easy way)
+### Declaring API methods (the easy way)
 
 The easiest way to expose an API method is to just associate the method name
 with its function. When exposed, each of the parameters in the function will be
@@ -114,9 +114,10 @@ In the example above, when invoking `users.create`, the user would pass in three
 arguments: `username` `password`, and `name`. The framework automatically matches
 the arguments passed in by the user to the function arguments.
 
-### Handling each API method (the more descriptive way)
+### Declaring API methods (the more descriptive way)
 
-You can also optionally pass in an array, describing each argument separately:
+Alternatively, you can have more control over the behavior of each API method,
+as illustrated below:
 
 ```javascript
 function createUser(username, password, name) {
@@ -152,25 +153,43 @@ const model = swatch({
     },
 });
 ```
+
 In this scenario, when invoking `users.create`, the user would still pass in
 three arguments: `username`, `password`, and `name`. The framework automatically
 matches the `username` value to the first argument, the `password` value to the
 second argument, and `name` value to the third argument of the `createUser`
 function. Additionally, the `name` value is optional and will provide a default
-value of 'New User' if the argument is not present.
+value of `'New User'` if the argument is not present.
+
+If the `args` array is present, it must match the function in arity (i.e., the
+number of arguments declared in the function must match the number of elements
+in the `args` array).
 
 The following properties can be set:
 
-| Property              | Required  | Description                                       |
-|:---                   |:---       |:---                                               |
-|`handler`              | Yes       | The API handler. Must be a function.              |
-|`args`                 | No        | Function arguments. Must be an array.             |
-|`args[idx].name`       | No        | The name of the parameter as passed by caller.    |
-|`args[idx].parse`      | No        | A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.    |
-|`args[idx].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.    |
-|`args[idx].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.         |
-|`args[idx].default`    | No        | A primitive type or object. If user fails to provide an optional argument, the default will be provided.         |
-|`middleware`           | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler |
+| Property              | Required  | Description
+|:---                   |:---       |:---
+|`handler`              | Yes       | The API handler. Must be a function.
+|`args`                 | No        | Function arguments. Must be an array. See below for more information.
+|`middleware`           | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler.
+
+If the `args` array is present, it must match the function in arity (i.e., the
+number of arguments declared in the function must match the number of elements
+in the `args` array). Each element in the array can be either a string or an
+object.
+
+If an element is an object, then the following properties are valid:
+
+| Property              | Required  | Description
+|:---                   |:---       |:---
+|`args[idx].name`       | No        | The name of the parameter as passed by caller. Defaults to the name specified in the function.
+|`args[idx].parse`      | No        | A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.
+|`args[idx].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.
+|`args[idx].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.
+|`args[idx].default`    | No        | A primitive type or object. If user fails to provide an optional argument, the default will be provided.
+
+If an element is a string "argName", then it is considered equivalent to the
+object `{ name: "argName" }`.
 
 ## Runtime errors
 
