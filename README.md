@@ -1,5 +1,7 @@
 # swatchjs
 
+[![CircleCI](https://circleci.com/gh/builtforme/swatchjs.svg?style=svg)](https://circleci.com/gh/builtforme/swatchjs) | [![Known Vulnerabilities](https://snyk.io/test/github/builtforme/swatchjs/badge.svg)](https://snyk.io/test/github/builtforme/swatchjs)
+
 A framework for easily creating and exposing APIs as methods.
 
 This framework allows your API functions to be written in the same way that any
