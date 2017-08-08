@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "nyc mocha 'test/**/*.test.js'",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "coveralls": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
     "codecov": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "test:debug": "mocha --debug-brk"
   },
