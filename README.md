@@ -1,7 +1,7 @@
 # swatchjs
 
 [![CircleCI](https://circleci.com/gh/builtforme/swatchjs.svg?style=svg)](https://circleci.com/gh/builtforme/swatchjs) |
-[![codecov](https://codecov.io/gh/builtforme/swatchjs/branch/master/graph/badge.svg)](https://codecov.io/gh/builtforme/swatchjs) | [![Known Vulnerabilities](https://snyk.io/test/github/builtforme/swatchjs/badge.svg)](https://snyk.io/test/github/builtforme/swatchjs)
+[![codecov](https://codecov.io/gh/builtforme/swatchjs/branch/master/graph/badge.svg)](https://codecov.io/gh/builtforme/swatchjs) | [![Coverage Status](https://coveralls.io/repos/github/builtforme/swatchjs-koa/badge.svg?branch=master)](https://coveralls.io/github/builtforme/swatchjs-koa?branch=master) | [![Known Vulnerabilities](https://snyk.io/test/github/builtforme/swatchjs/badge.svg)](https://snyk.io/test/github/builtforme/swatchjs)
 
 A framework for easily creating and exposing APIs as methods.
 
