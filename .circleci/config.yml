@@ -161,10 +161,10 @@ workflows:
   build_tag_publish:
     jobs:
         - build
-        - report_code_coverage_coveralls
+        - report_code_coverage_coveralls:
             requires:
               - build
-        - report_code_coverage_codecov
+        - report_code_coverage_codecov:
             requires:
               - build
         - publish:
