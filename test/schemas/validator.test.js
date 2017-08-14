@@ -38,6 +38,7 @@ describe('validator', () => {
             (ctx, next) => { next },
             (ctx, next) => { true },
           ],
+          noAuth: true,
         },
       };
       const validatedApi = validate(api);
@@ -116,6 +117,24 @@ describe('validator', () => {
         },
       };
       expect(() => validate(nonFunctionHandler)).to.throw();
+    });
+
+    it('should throw on invalid noAuth type', () => {
+      const nonBoolAuthParam = {
+        fn: {
+          handler: 100,
+          noAuth: 10000,
+        },
+      };
+      expect(() => validate(nonBoolAuthParam)).to.throw();
+
+      const functionAuthParam = {
+        fn: {
+          handler: 100,
+          noAuth: () => { return true; },
+        },
+      };
+      expect(() => validate(functionAuthParam)).to.throw();
     });
 
     it('should throw on invalid arg definition', () => {

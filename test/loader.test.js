@@ -5,10 +5,11 @@ const load = require('../lib/loader');
 
 function validate(model) {
   model.forEach(method => {
-    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'middleware');
+    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'middleware', 'noAuth');
     expect(method.name).to.be.a('string');
     expect(method.handle).to.be.a('function');
     expect(method.middleware).to.be.an('array');
+    expect(method.noAuth).to.be.an('boolean');
   });
 }
 
