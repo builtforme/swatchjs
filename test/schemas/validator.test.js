@@ -31,12 +31,14 @@ describe('validator', () => {
               default: 12,
             },
           ],
-          middleware: [
-            ctx => (ctx),
-            () => {},
-            () => (true),
-          ],
-          noAuth: true,
+          metadata: {
+            middleware: [
+              ctx => (ctx),
+              () => {},
+              () => (true),
+            ],
+            noAuth: true,
+          },
         },
       };
       const validatedApi = validate(api);
@@ -121,7 +123,9 @@ describe('validator', () => {
       const nonBoolAuthParam = {
         fn: {
           handler: 100,
-          noAuth: 10000,
+          metadata: {
+            noAuth: 10000,
+          },
         },
       };
       expect(() => validate(nonBoolAuthParam)).to.throw();
@@ -129,7 +133,9 @@ describe('validator', () => {
       const functionAuthParam = {
         fn: {
           handler: 100,
-          noAuth: () => (true),
+          metadata: {
+            noAuth: () => (true),
+          },
         },
       };
       expect(() => validate(functionAuthParam)).to.throw();
@@ -224,11 +230,23 @@ describe('validator', () => {
       expect(() => validate(invalidOptionalParam)).to.throw();
     });
 
+    it('should throw on invalid metadata definition', () => {
+      const invalidMetadataHandler = {
+        fn: {
+          handler: arg1 => (arg1),
+          metadata: () => {},
+        },
+      };
+      expect(() => validate(invalidMetadataHandler)).to.throw();
+    });
+
     it('should throw on invalid middleware definition', () => {
       const numberMiddlewareHandler = {
         fn: {
           handler: arg1 => (arg1),
-          middleware: 100,
+          metadata: {
+            middleware: 100,
+          },
         },
       };
       expect(() => validate(numberMiddlewareHandler)).to.throw();
@@ -236,7 +254,9 @@ describe('validator', () => {
       const functionMiddlewareHandler = {
         fn: {
           handler: arg1 => (arg1),
-          middleware: () => {},
+          metadata: {
+            middleware: () => {},
+          },
         },
       };
       expect(() => validate(functionMiddlewareHandler)).to.throw();
@@ -244,7 +264,9 @@ describe('validator', () => {
       const numArrayMiddlewareHandler = {
         fn: {
           handler: arg1 => (arg1),
-          middleware: [1, 2, 3, 4, 5],
+          metadata: {
+            middleware: [1, 2, 3, 4, 5],
+          },
         },
       };
       expect(() => validate(numArrayMiddlewareHandler)).to.throw();
@@ -252,7 +274,9 @@ describe('validator', () => {
       const mixedArrayMiddlewareHandler = {
         fn: {
           handler: arg1 => (arg1),
-          middleware: [1, true, () => {}, () => {}],
+          metadata: {
+            middleware: [1, true, () => {}, () => {}],
+          },
         },
       };
       expect(() => validate(mixedArrayMiddlewareHandler)).to.throw();
