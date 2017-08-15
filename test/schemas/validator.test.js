@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('chai').expect;
 
 const serviceSchema = require('../../lib/schemas/service');
@@ -9,14 +7,14 @@ const validate = schemaValidator(serviceSchema);
 
 
 describe('validator', () => {
-  const validateArg1 = (arg) => {};
-  const validateArg2 = (arg) => {};
+  const validateArg1 = () => {};
+  const validateArg2 = () => {};
 
   describe('schema', () => {
     it('should allow a valid schema', () => {
       const api = {
         fn: {
-          handler: (arg_1, arg_2) => { arg_1 + arg_2 },
+          handler: (arg1, arg2) => (arg1 + arg2),
           args: [
             {
               name: 'arg_1',
@@ -34,9 +32,9 @@ describe('validator', () => {
             },
           ],
           middleware: [
-            (ctx, next) => { ctx },
-            (ctx, next) => { next },
-            (ctx, next) => { true },
+            ctx => (ctx),
+            () => {},
+            () => (true),
           ],
           noAuth: true,
         },
@@ -49,8 +47,8 @@ describe('validator', () => {
     it('should allow a valid schema', () => {
       const api = {
         fn: {
-          handler: (a, b) => { a + b },
-          args: [ 'a', 'b' ],
+          handler: (a, b) => (a + b),
+          args: ['a', 'b'],
         },
       };
       const validatedApi = validate(api);
@@ -74,7 +72,7 @@ describe('validator', () => {
       expect(() => validate(invalidName2)).to.throw();
 
       const invalidName3 = {
-        '_some_function_': {
+        _some_function_: {
           handler: () => { },
         },
       };
@@ -96,7 +94,7 @@ describe('validator', () => {
 
       const unexpectedVars = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           args: [
             {
               name: 'arg_1',
@@ -131,7 +129,7 @@ describe('validator', () => {
       const functionAuthParam = {
         fn: {
           handler: 100,
-          noAuth: () => { return true; },
+          noAuth: () => (true),
         },
       };
       expect(() => validate(functionAuthParam)).to.throw();
@@ -140,7 +138,7 @@ describe('validator', () => {
     it('should throw on invalid arg definition', () => {
       const extraArgParam = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           args: [
             {
               name: 'arg_1',
@@ -156,7 +154,7 @@ describe('validator', () => {
 
       const invalidArgName = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           args: [
             {
               name: '_name-invalid_',
@@ -169,7 +167,7 @@ describe('validator', () => {
 
       const invalidArgParam = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           args: [
             {
               name: '_name-invalid_',
@@ -183,7 +181,7 @@ describe('validator', () => {
 
       const invalidParseFn = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           args: [
             {
               parse: 'number',
@@ -197,7 +195,7 @@ describe('validator', () => {
 
       const invalidValidateFn = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           args: [
             {
               parse: Number,
@@ -211,7 +209,7 @@ describe('validator', () => {
 
       const invalidOptionalParam = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           args: [
             {
               name: 'arg_1',
@@ -229,7 +227,7 @@ describe('validator', () => {
     it('should throw on invalid middleware definition', () => {
       const numberMiddlewareHandler = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           middleware: 100,
         },
       };
@@ -237,15 +235,15 @@ describe('validator', () => {
 
       const functionMiddlewareHandler = {
         fn: {
-          handler: (arg_1) => { arg_1 },
-          middleware: (ctx, next) => { ctx },
+          handler: arg1 => (arg1),
+          middleware: () => {},
         },
       };
       expect(() => validate(functionMiddlewareHandler)).to.throw();
 
       const numArrayMiddlewareHandler = {
         fn: {
-          handler: (arg_1) => { arg_1 },
+          handler: arg1 => (arg1),
           middleware: [1, 2, 3, 4, 5],
         },
       };
@@ -253,8 +251,8 @@ describe('validator', () => {
 
       const mixedArrayMiddlewareHandler = {
         fn: {
-          handler: (arg_1) => { arg_1 },
-          middleware: [1, true, (ctx, next) => { ctx }, (ctx, next) => { ctx }],
+          handler: arg1 => (arg1),
+          middleware: [1, true, () => {}, () => {}],
         },
       };
       expect(() => validate(mixedArrayMiddlewareHandler)).to.throw();
