@@ -3,11 +3,10 @@ const load = require('../lib/loader');
 
 function validate(model) {
   model.forEach((method) => {
-    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'middleware', 'noAuth');
+    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'metadata');
     expect(method.name).to.be.a('string');
     expect(method.handle).to.be.a('function');
-    expect(method.middleware).to.be.an('array');
-    expect(method.noAuth).to.be.an('boolean');
+    expect(method.metadata).to.be.an('object');
   });
 }
 
@@ -72,12 +71,38 @@ describe('model', () => {
       expect(() => load(api)).to.throw();
     });
 
+    it('should reject if metadata is not an object', () => {
+      const api = {
+        noop: {
+          handler: (a, b) => (a + b),
+          args: ['a', 'b'],
+          metadata: () => {},
+        },
+      };
+      expect(() => load(api)).to.throw();
+    });
+
     it('should reject if middleware is not a list of functions', () => {
       const api = {
         noop: {
           handler: (a, b) => (a + b),
           args: ['a', 'b'],
-          middleware: [1, () => {}],
+          metadata: {
+            middleware: [1, () => {}],
+          },
+        },
+      };
+      expect(() => load(api)).to.throw();
+    });
+
+    it('should reject if noAuth is not a boolean', () => {
+      const api = {
+        noop: {
+          handler: (a, b) => (a + b),
+          args: ['a', 'b'],
+          metadata: {
+            noAuth: 0,
+          },
         },
       };
       expect(() => load(api)).to.throw();
@@ -98,7 +123,6 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
-      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
     });
 
     it('should accept an endpoint with only named arguments', () => {
@@ -112,7 +136,6 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
-      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
     });
 
     it('should accept an endpoint with an unnamed argument array', () => {
@@ -129,7 +152,6 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
-      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
     });
 
     it('should produce an endpoint metadata array', () => {
@@ -152,7 +174,6 @@ describe('model', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
-      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(0);
     });
 
     it('should pass in middleware array', () => {
@@ -174,16 +195,18 @@ describe('model', () => {
               parse: Number,
             },
           ],
-          middleware,
+          metadata: {
+            middleware,
+          },
         },
       };
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
 
-      expect(model[0].middleware).to.be.an('array').that.has.lengthOf(2);
-      expect(model[0].middleware[0](1, 2)).to.equal(1);
-      expect(model[0].middleware[1](1, 2)).to.equal(3);
+      expect(model[0].metadata.middleware).to.be.an('array').that.has.lengthOf(2);
+      expect(model[0].metadata.middleware[0](1, 2)).to.equal(1);
+      expect(model[0].metadata.middleware[1](1, 2)).to.equal(3);
     });
   });
 });
