@@ -5,7 +5,7 @@ function execHandler(handle, args) {
   const mockCtx = {
     swatchCtx: {},
   };
-  handle.match(mockCtx, args);
+  handle.validate(mockCtx, args);
   return handle.handle(mockCtx);
 }
 
