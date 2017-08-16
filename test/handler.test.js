@@ -355,6 +355,40 @@ describe('handler', () => {
     expect(() => execHandler(handler(method), { arg: -1 })).to.throw('negative_number');
   });
 
+  describe('validate params', () => {
+    it('should provide access to validated params', () => {
+      const fn = (a, b, c) => ({ a, b, c });
+      const method = {
+        handler: fn,
+        args: [
+          {
+            name: 'a',
+            parse: Number,
+          },
+          {
+            name: 'b',
+            parse: Boolean,
+          },
+          {
+            name: 'c',
+            parse: String,
+          },
+        ],
+      };
+      const handle = handler(method);
+
+      const mockCtx = {
+        swatchCtx: {},
+      };
+      handle.validate(mockCtx, { a: '100', b: true, c: 'Success' });
+
+      expect(mockCtx.swatchCtx.values).to.deep.equal([100, true, 'Success']);
+      expect(mockCtx.swatchCtx.params.a).to.equal(100);
+      expect(mockCtx.swatchCtx.params.b).to.equal(true);
+      expect(mockCtx.swatchCtx.params.c).to.equal('Success');
+    });
+  });
+
   describe('default values', () => {
     it('should not use default values for required arguments', () => {
       const fn = a => (a);
