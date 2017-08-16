@@ -9,6 +9,7 @@
         "ecmaFeatures": {}
     },
     "rules": {
-      "no-throw-literal": "off"
+        "no-throw-literal": "off",
+        "no-param-reassign": ["error", { "props": false }]
     }
 }

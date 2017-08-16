@@ -1,6 +1,14 @@
 const expect = require('chai').expect;
 const handler = require('../lib/handler');
 
+function execHandler(handle, args) {
+  const mockCtx = {
+    swatchCtx: {},
+  };
+  handle.match(mockCtx, args);
+  return handle.handle(mockCtx);
+}
+
 describe('handler', () => {
   describe('load time', () => {
     it('should throw if args are provided and arity doesnt match', () => {
@@ -92,15 +100,15 @@ describe('handler', () => {
     });
 
     it('should throw if all required parameters were not passed', () => {
-      expect(() => handle({ a: 1 })).to.throw('missing_arg');
+      expect(() => execHandler(handle, { a: 1 })).to.throw('missing_arg');
     });
 
     it('should throw if a required parameter was undefined', () => {
-      expect(() => handle({ a: 1, b: undefined })).to.throw('missing_arg');
+      expect(() => execHandler(handle, { a: 1, b: undefined })).to.throw('missing_arg');
     });
 
     it('should throw if a parameter passed was not expected', () => {
-      expect(() => handle({ a: 1, b: 2, c: 3 })).to.throw('invalid_arg_name');
+      expect(() => execHandler(handle, { a: 1, b: 2, c: 3 })).to.throw('invalid_arg_name');
     });
 
     it('should invoke the handler if all required arguments were passed', () => {
@@ -123,7 +131,7 @@ describe('handler', () => {
           },
         ],
       };
-      const result = handler(method)({ a: 1, b: 2 });
+      const result = execHandler(handler(method), { a: 1, b: 2 });
       expect(result).to.equal(3);
     });
 
@@ -135,8 +143,8 @@ describe('handler', () => {
           { name: 'c' },
         ],
       };
-      expect(() => handler(api)({ a: '.', b: '.' })).to.throw();
-      expect(() => handler(api)({ a: '.', c: '.' })).not.to.throw();
+      expect(() => execHandler(handler(api), { a: '.', b: '.' })).to.throw();
+      expect(() => execHandler(handler(api), { a: '.', c: '.' })).not.to.throw();
     });
   });
 
@@ -147,11 +155,11 @@ describe('handler', () => {
     });
 
     it('should throw if all required parameters were not passed', () => {
-      expect(() => handle({ x: '1' })).to.throw('missing_arg');
+      expect(() => execHandler(handle, { x: '1' })).to.throw('missing_arg');
     });
 
     it('should throw if a parameter passed was not expected', () => {
-      expect(() => handle({ w: '0', x: '1', y: '2', z: '3' })).to.throw('invalid_arg_name');
+      expect(() => execHandler(handle, { w: '0', x: '1', y: '2', z: '3' })).to.throw('invalid_arg_name');
     });
 
     it('should invoke the handler if all required arguments were passed', () => {
@@ -168,7 +176,7 @@ describe('handler', () => {
         handler: fn,
         args: ['x', 'y', 'z'],
       };
-      const result = handler(method)({ z: '3', y: '2', x: '1' });
+      const result = execHandler(handler(method), { z: '3', y: '2', x: '1' });
       expect(result).to.equal('123');
     });
 
@@ -190,11 +198,11 @@ describe('handler', () => {
           { parse: String },
         ],
       };
-      const result = handler(method)({ c: '3', x: '2', y: '1' });
+      const result = execHandler(handler(method), { c: '3', x: '2', y: '1' });
       expect(result).to.equal('123');
 
-      expect(() => handler(method)({ a: '1', b: '2', c: '3' })).to.throw('invalid_arg_name');
-      expect(() => handler(method)({ x: '1', y: '2', z: '3' })).to.throw('invalid_arg_name');
+      expect(() => execHandler(handler(method), { a: '1', b: '2', c: '3' })).to.throw('invalid_arg_name');
+      expect(() => execHandler(handler(method), { x: '1', y: '2', z: '3' })).to.throw('invalid_arg_name');
     });
   });
 
@@ -208,11 +216,11 @@ describe('handler', () => {
     });
 
     it('should throw if all required parameters were not passed', () => {
-      expect(() => handle({ a: 1 })).to.throw('missing_arg');
+      expect(() => execHandler(handle, { a: 1 })).to.throw('missing_arg');
     });
 
     it('should throw if a parameter passed was not expected', () => {
-      expect(() => handle({ a: 1, b: 2, c: 3 })).to.throw('invalid_arg_name');
+      expect(() => execHandler(handle, { a: 1, b: 2, c: 3 })).to.throw('invalid_arg_name');
     });
 
     it('should invoke the handler if all required arguments were passed', () => {
@@ -229,7 +237,7 @@ describe('handler', () => {
           { parse: Number },
         ],
       };
-      const result = handler(method)({ b: 2, a: 1 });
+      const result = execHandler(handler(method), { b: 2, a: 1 });
       expect(result).to.equal(3);
     });
   });
@@ -240,11 +248,11 @@ describe('handler', () => {
     });
 
     it('should throw if all required parameters were not passed', () => {
-      expect(() => handle({ a: 1 })).to.throw('missing_arg');
+      expect(() => execHandler(handle, { a: 1 })).to.throw('missing_arg');
     });
 
     it('should throw if a parameter passed was not expected', () => {
-      expect(() => handle({ a: 1, b: 2, c: 3 })).to.throw('invalid_arg_name');
+      expect(() => execHandler(handle, { a: 1, b: 2, c: 3 })).to.throw('invalid_arg_name');
     });
 
     it('should invoke the handler if all required arguments were passed', () => {
@@ -257,7 +265,7 @@ describe('handler', () => {
       const method = {
         handler: fn,
       };
-      const result = handler(method)({ a: 1, b: 2 });
+      const result = execHandler(handler(method), { a: 1, b: 2 });
       expect(result).to.equal(3);
     });
   });
@@ -274,12 +282,12 @@ describe('handler', () => {
     });
 
     it('should invoke the handler if optional arguments were omitted', () => {
-      const result = handle({});
+      const result = execHandler(handle, {});
       expect(result).to.equal(undefined);
     });
 
     it('should invoke the handler if optional arguments were passed', () => {
-      const result = handle({ a: 'hello' });
+      const result = execHandler(handle, { a: 'hello' });
       expect(result).to.equal('hello');
     });
   });
@@ -305,20 +313,21 @@ describe('handler', () => {
     };
 
     // Framework should explicitly throw on missing or undefined values
-    expect(() => handler(method)({})).to.throw('missing_arg');
-    expect(() => handler(method)({ argNum: undefined })).to.throw('missing_arg');
+    const handle = handler(method);
+    expect(() => execHandler(handle, {})).to.throw('missing_arg');
+    expect(() => execHandler(handle, { argNum: undefined })).to.throw('missing_arg');
 
     // Otherwise it should accept the values and run the parser
-    const resultZero = handler(method)({ argNum: 0 });
+    const resultZero = execHandler(handle, { argNum: 0 });
     expect(resultZero).to.equal(false);
 
-    const resultUndefined = handler(method)({ argNum: null });
+    const resultUndefined = execHandler(handle, { argNum: null });
     expect(resultUndefined).to.equal(true);
 
-    const resultFalse = handler(method)({ argNum: false });
+    const resultFalse = execHandler(handle, { argNum: false });
     expect(resultFalse).to.equal(true);
 
-    const resultNumber = handler(method)({ argNum: 1 });
+    const resultNumber = execHandler(handle, { argNum: 1 });
     expect(resultNumber).to.equal(true);
   });
 
@@ -343,7 +352,7 @@ describe('handler', () => {
         },
       ],
     };
-    expect(() => handler(method)({ arg: -1 })).to.throw('negative_number');
+    expect(() => execHandler(handler(method), { arg: -1 })).to.throw('negative_number');
   });
 
   describe('default values', () => {
@@ -360,8 +369,9 @@ describe('handler', () => {
           },
         ],
       };
-      expect(handler(method)({ a: 2 })).to.equal(2);
-      expect(() => handler(method)({})).to.throw('missing_arg');
+      const handle = handler(method);
+      expect(execHandler(handle, { a: 2 })).to.equal(2);
+      expect(() => execHandler(handle, {})).to.throw('missing_arg');
     });
 
     it('should use default values for optional argument when undefined', () => {
@@ -399,6 +409,7 @@ describe('handler', () => {
           },
         ],
       };
+      const handle = handler(method);
 
       function checkResult(result, a, b, c, d) {
         expect(result.a).to.equal(a);
@@ -411,16 +422,16 @@ describe('handler', () => {
         });
       }
 
-      const r1 = handler(method)({});
+      const r1 = execHandler(handle, {});
       checkResult(r1, 0, false, [], '');
 
-      const r2 = handler(method)({ a: '100', b: true });
+      const r2 = execHandler(handle, { a: '100', b: true });
       checkResult(r2, 100, true, [], '');
 
-      const r3 = handler(method)({ b: false, c: [0] });
+      const r3 = execHandler(handle, { b: false, c: [0] });
       checkResult(r3, 0, false, [0], '');
 
-      const r4 = handler(method)({ c: [], d: 'false' });
+      const r4 = execHandler(handle, { c: [], d: 'false' });
       checkResult(r4, 0, false, [], 'false');
     });
   });
