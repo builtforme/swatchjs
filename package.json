@@ -1,6 +1,6 @@
 {
   "name": "swatchjs",
-  "version": "0.2.2",
+  "version": "1.0.0",
   "description": "Framework for easily creating and exposing APIs as methods",
   "main": "lib/index.js",
   "scripts": {
