@@ -3,9 +3,10 @@ const load = require('../lib/loader');
 
 function validate(model) {
   model.forEach((method) => {
-    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'metadata');
+    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'validate', 'metadata');
     expect(method.name).to.be.a('string');
     expect(method.handle).to.be.a('function');
+    expect(method.validate).to.be.a('function');
 
     expect(method.metadata).to.be.an('object').that.has.all.keys('noAuth', 'middleware');
     expect(method.metadata.noAuth).to.be.an('boolean');
