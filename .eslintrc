@@ -9,6 +9,6 @@
         "ecmaFeatures": {}
     },
     "rules": {
-      "no-throw-literal": 0
+      "no-throw-literal": "off"
     }
 }
