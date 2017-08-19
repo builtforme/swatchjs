@@ -3,7 +3,9 @@ const handler = require('../lib/handler');
 
 function execHandler(handle, args) {
   const mockCtx = {
-    swatchCtx: {},
+    swatchCtx: {
+      testVal: 100,
+    },
   };
   handle.validate(mockCtx, args);
   return handle.handle(mockCtx);
@@ -386,6 +388,29 @@ describe('handler', () => {
       expect(mockCtx.swatchCtx.params.a).to.equal(100);
       expect(mockCtx.swatchCtx.params.b).to.equal(true);
       expect(mockCtx.swatchCtx.params.c).to.equal('Success');
+    });
+  });
+
+  describe('context', () => {
+    it('should pass the swatchCtx as this param in final handler', () => {
+      function fn(a, b) {
+        return a + b + this.testVal;
+      }
+      const method = {
+        handler: fn,
+        args: [
+          {
+            name: 'a',
+            parse: Number,
+          },
+          {
+            name: 'b',
+            parse: Number,
+          },
+        ],
+      };
+      const handle = handler(method);
+      expect(execHandler(handle, { a: '25', b: '50' })).to.equal(175);
     });
   });
 
