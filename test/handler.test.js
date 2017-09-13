@@ -384,7 +384,7 @@ describe('handler', () => {
       };
       handle.validate(mockCtx, { a: '100', b: true, c: 'Success' });
 
-      expect(mockCtx.swatchCtx.values).to.deep.equal([100, true, 'Success']);
+      expect(mockCtx.swatchCtx.keys).to.deep.equal(['a', 'b', 'c']);
       expect(mockCtx.swatchCtx.params.a).to.equal(100);
       expect(mockCtx.swatchCtx.params.b).to.equal(true);
       expect(mockCtx.swatchCtx.params.c).to.equal('Success');
