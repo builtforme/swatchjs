@@ -1,9 +1,14 @@
 const expect = require('chai').expect;
 const handler = require('../lib/handler');
 
+const mockLogger = {
+  info: () => {},
+};
+
 function execHandler(handle, args) {
   const mockCtx = {
     swatchCtx: {
+      logger: mockLogger,
       testVal: 100,
     },
   };
