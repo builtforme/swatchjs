@@ -1,26 +1,32 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>swatchjs</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <title>swatchjs</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 </head>
-<body>
-<header>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">swatchjs</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav">
-      <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-      <a class="nav-item nav-link" href="#">Usage</a>
+  <body>
+    <header>
+      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">swatchjs</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link" href="#">Usage</a>
+          </div>
+        </div>
+        <form class="form-inline">
+            <a href="https://github.com/builtforme/swatchjs" class="btn btn-outline-success" type="button">GitHub</a>
+        </form>
+      </nav>
+    </header>
+    <div class="container">
+      <h2>A framework for easily creating and exposing APIs as methods</h2>
+      <p>This framework allows your API functions to be written in the same way that any other function is written: they take parameters, have a return value, and throw exceptions. They are easy to write and test.</p>
+      <p>You can write your API independent of a transport layer. You don't have to worry about status codes, routes, request context, query parameters, or any of that code that slows you down. It's less code to write and test.</p>
+      <p>Next, you can choose how to expose your API, using one of pre-existing adapters, or by writing a new one. These adapters range from simple GET calls over HTTP, to SOAP, to JSON-RPC, to Protobufs, etc.</p>
     </div>
-  </div>
-  <form class="form-inline my-2 my-lg-0">
-      <a href="https://github.com/builtforme/swatchjs" class="btn btn-outline-success my-2 my-sm-0" type="button">GitHub</a>
-  </form>
-</nav>
-</header>
-</body
+  </body>
 </html>
