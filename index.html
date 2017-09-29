@@ -12,7 +12,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
+          <div class="navbar-nav"> <!-- Not totally sure about how the site should be divided -->
             <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
             <a class="nav-item nav-link" href="#">Usage</a>
           </div>
@@ -22,11 +22,22 @@
         </form>
       </nav>
     </header>
-    <div class="container">
+    <div style="margin-top: 40px;" class="container">
+      <!-- Possibly we could include some sort of image here to make the site look a little less sparse-->
       <h2>A framework for easily creating and exposing APIs as methods</h2>
+      <hr>
       <p>This framework allows your API functions to be written in the same way that any other function is written: they take parameters, have a return value, and throw exceptions. They are easy to write and test.</p>
       <p>You can write your API independent of a transport layer. You don't have to worry about status codes, routes, request context, query parameters, or any of that code that slows you down. It's less code to write and test.</p>
       <p>Next, you can choose how to expose your API, using one of pre-existing adapters, or by writing a new one. These adapters range from simple GET calls over HTTP, to SOAP, to JSON-RPC, to Protobufs, etc.</p>
+    </div>
+    <div style="margin-top: 40px;" class="container">
+      <h3>Benefits</h3>
+      <hr>
+      <ul>
+        <li>
+          <p><b>Your code is simple</b></p>
+          <p>Write service API functions the same way you write any other function in the language (they take parameters, have a return value, and throw exceptions).</p>
+      </ul>
     </div>
   </body>
 </html>
