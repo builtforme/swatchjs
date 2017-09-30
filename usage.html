@@ -23,8 +23,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav"> <!-- Not totally sure about how the site should be divided -->
-            <a class="nav-item nav-link active" href="index.html">Home</a>
-            <a class="nav-item nav-link" href="usage.html">Usage</a>
+            <a class="nav-item nav-link" href="index.html">Home</a>
+            <a class="nav-item nav-link active" href="usage.html">Usage</a>
             <a class="nav-item nav-link" href="reference.html">API Reference</a>
           </div>
         </div>
@@ -35,45 +35,30 @@
         </form> -->
       </nav>
     </header>
-    <div class="jumbotron">
-     <div class="container">
-       <h1>swatchjs</h1>
-       <p>A great way to simplify API usage</p>
-       <p><a class="btn btn-primary btn-lg" href="https://github.com/builtforme/swatchjs" role="button">View on GitHub &raquo;</a></p>
-     </div>
-    </div>
 
     <div style="margin-top: 40px;" class="container">
       <!-- Possibly we could include some sort of image here to make the site look a little less sparse-->
-      <h2>A framework for easily creating and exposing APIs as methods</h2>
+      <h2>Usage</h2>
       <hr>
-      <p>This framework allows your API functions to be written in the same way that any other function is written: they take parameters, have a return value, and throw exceptions. They are easy to write and test.</p>
-      <p>You can write your API independent of a transport layer. You don't have to worry about status codes, routes, request context, query parameters, or any of that code that slows you down. It's less code to write and test.</p>
-      <p>Next, you can choose how to expose your API, using one of pre-existing adapters, or by writing a new one. These adapters range from simple GET calls over HTTP, to SOAP, to JSON-RPC, to Protobufs, etc.</p>
-    </div>
-    <div style="margin-top: 40px;" class="container">
-      <h3>Benefits</h3>
+      <h3>Installation</h3>
+      <p>Simply use <code>npm install swatchjs</code> to install the necessary files.</p>
       <hr>
-      <ul>
-        <li>
-          <p><b>Your code is simple</b></p>
-          <p>Write service API functions the same way you write any other function in the language (they take parameters, have a return value, and throw exceptions).</p>
-        </li>
-        <li>
-          <p><b>Your functions are easy to write and test</b></p>
-          <p>You only need to write and test the logical behavior of the function, not the transport layer (HTTP headers, status codes, etc.).</p>
-        </li>
-        <li>
-          <p><b>Faster, better, cheaper</b></p>
-          <p>Because you are not checking HTTP headers or query parameters, nor are you producing HTTP status codes, response headers, etc., you can write less code, which in turn means less bugs. You can also deliver more in less time.</p>
-        </li>
-        <li>
-          <p><b>DRY (Don't Repeat Yourself)</b></p>
-          <p>Because you are only writing core logic in the language, the same functions can be reused as needed. They can be used internally as building blocks for other functions, they can be exposed as web APIs, or wrapped in CLI tools.</p>
-        </li>
-      </ul>
-      <hr>
+      <h3>Sample Usage</h3>
+      <p>The following creates a simple API which takes 2 parameters (<code>a</code> and <code>b</code>) and returns their sum (<code>add</code> method) or difference (<code>sub</code> method).</p>
+      <p>
+        <pre>
+          <code>
+          const swatch = require('swatchjs');
 
+          const model = swatch({
+              add: (a, b) => a + b,
+              sub: (a, b) => a - b,
+          });
+          </code>
+        </pre>
+      </p>
+      <p>That's it. You are in business. All that is left is to expose the model, usually through one of the adapters. It's quick and easy. No need to write unnecessary code for the application or transport layer. KISS.</p>
+      <hr>
       <footer>
         <p>Developed by Built For Me</p>
       </footer>
