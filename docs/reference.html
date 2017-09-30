@@ -141,7 +141,94 @@
         </pre>
       </p>
       <p>In this scenario, when invoking <code>users.create</code>, the user would still pass in three arguments: <code>username</code>, <code>password</code>, and <code>name</code>. The framework automatically matches the <code>username</code> value to the first argument, the <code>password</code> value to the second argument, and <code>name</code> value to the third argument of the <code>createUser</code> function. Additionally, the <code>name</code> value is optional and will provide a default value of <code>'New User'</code> if the argument is not present.</p>
-      <p>If the <code>args</code> array is present, it must match the function in arity (i.e., the number of arguments declared in the function must match the number of elements in the <code>args</code> array).
+      <p>If the <code>args</code> array is present, it must match the function in arity (i.e., the number of arguments declared in the function must match the number of elements in the <code>args</code> array).</p>
+      <p>The following properties can be set:</p>
+      <table class="table">
+        <thead class="thead-default">
+          <tr>
+            <th>Property</th>
+            <th>Required?</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>handler</code></td>
+            <td>Yes</td>
+            <td>The API handler. Must be a function.</td>
+          </tr>
+          <tr>
+            <td><code>args</code></td>
+            <td>No</td>
+            <td>Function arguments. Must be an array. See below for more information.</td>
+          </tr>
+          <tr>
+            <td><code>middleware</code></td>
+            <td>No</td>
+            <td>An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>If the <code>args</code> array is present, it must match the function in arity (i.e., the number of arguments declared in the function must match the number of elements in the <code>args</code> array). Each element in the array can be either a string or an object.</p>
+      <p>If an element is an object, then the following properties are valid:</p>
+      <table class="table">
+        <thead class="thead-default">
+          <tr>
+            <th>Property</th>
+            <th>Required?</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>args[idx].name</code></td>
+            <td>No</td>
+            <td>The name of the parameter as passed by caller. Defaults to the name specified in the function.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].parse</code></td>
+            <td>No</td>
+            <td>A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].validate/code></td>
+            <td>No</td>
+            <td>A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].optional</code></td>
+            <td>No</td>
+            <td>A boolean indicating whether the argument is optional. Defaults to false. If user fails to provide a required arguments, the request will fail.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].default</code></td>
+            <td>No</td>
+            <td>A primitive type or object. If user fails to provide an optional argument, the default will be provided.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>If an element is a string "argName", then it is considered equivalent to the object <code>{ name: "argName" }</code>.</p>
+      <h4>Runtime Errors</h4>
+      <hr>
+      <p>The following errors will be generated during runtime (when invoking the handler):</p>
+      <table class="table">
+        <thead class="thead-default">
+          <tr>
+            <th>Error</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>invalid_arg_name</code></td>
+            <td>One or more of the provided arguments was not expected by the handler.</td>
+          </tr>
+          <tr>
+            <td><code>missing_arg</code></td>
+            <td>One or more of the required arguments were not provided.</td>
+          </tr>
+        </tbody>
+      </table>
       <hr>
       <footer>
         <p>Developed by Built For Me</p>
