@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>swatchjs</title>
+  <!-- Core Bootstrap integration -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+  <body>
+    <header>
+      <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">swatchjs</a>
+       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav"> <!-- Not totally sure about how the site should be divided -->
+            <a class="nav-item nav-link" href="index.html">Home</a>
+            <a class="nav-item nav-link" href="usage.html">Usage</a>
+            <a class="nav-item nav-link active" href="reference.html">API Reference</a>
+          </div>
+        </div>
+        <!-- Not sure if it's necessary to include the button below-->
+        <!--
+        <form class="form-inline">
+            <a href="https://github.com/builtforme/swatchjs" class="btn btn-outline-success" type="button">GitHub</a>
+        </form> -->
+      </nav>
+    </header>
+
+    <div style="margin-top: 40px;" class="container">
+      <!-- Possibly we could include some sort of image here to make the site look a little less sparse-->
+      <h2>API Reference</h2>
+      <hr>
+      <h4>The <code>swatch</code> function</h4>
+      <p>
+        <pre>
+          <code>
+            const swatch = require('swatchjs');
+
+            const model = swatch({
+                // api
+            });
+          </code>
+        </pre>
+      </p>
+      <p>Loading this library will result in a function (<code>swatch</code> in the example above) which when called will produce a model for the API. This model can then be passed to adapters to expose that API. See <a href="#exposing-the-api">Exposing the API</a> below for more details.
+      <h4>Declaring your API</h4>
+      <p>This function takes an object which describes the API, and it looks like this:</p>
+      <p>
+        <pre>
+          <code>
+            {
+                "service.api1": myApiFn1,
+                "service.api2": myApiFn2,
+                // ...
+            }
+          </code>
+        </pre>
+      </p>
+      <p>Each <code>methodName</code> is the name for the API you want to expose. The convention is to group the APIs by functionality area (often by microservices), with camelCase names separated by dots (e.g.:<code>users.create</code>, <code>users.delete</code>, <code>users.options.add</code>, <code>users.options.list</code>, <code>users.options.setDefault</code>).</p>
+      <p>Each method name is associated with a handler. The handler can be the function which will handle the API method call, or it can be an object that provides a little more flexibility in describing the function.</p>
+      <h4>Declaration-time errors</h4>
+      <p>The following errors will be generated when the API is declared:</p>
+      <table class="table">
+        <thead class="thead-default">
+          <tr>
+            <th>Error</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>invalid_arg_list</code></td>
+            <td>One or more of the provided method <code>args</code> lists did not match the handler function.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h4>Declaring API methods (the easy way)</h4>
+      <p>The easiest way to expose an API method is to just associate the method name with its function. When exposed, each of the parameters in the function will be arguments in the method.</p>
+      <p>
+        <pre>
+          <code>
+            function createUser(username, password, name) {
+                // ...
+            }
+
+            const model = swatch({
+                "users.create": createUser,
+            });
+          </code>
+        </pre>
+      </p>
+      <p>In the example above, when invoking <code>users.create</code>, the user would pass in three arguments: <code>username</code>, <code>password</code>, and <code>name</code>. The framework automatically matches the arguments passed in by the user to the function arguments.</p>
+      <h4>Declaring API methods (the more descriptive way)</h4>
+      <p>Alternatively, you can have more control over the behavior of each API method, as illustrated below:</p>
+      <p>
+        <pre>
+          <code>
+            function createUser(username, password, name) {
+                // ...
+            }
+
+            function middlewareFn(ctx, next) {
+                // ...
+            }
+
+            const model = swatch({
+                "users.create": {
+                    handler: createUser,
+                    args: [
+                        {
+                            name: 'username',
+                            parse: String,
+                            optional: false,
+                        },
+                        {
+                            name: 'password',
+                            parse: String,
+                            optional: false,
+                        },
+                        {
+                            name: 'name',
+                            parse: String,
+                            optional: true,
+                            default: 'New User',
+                        },
+                    ],
+                    middleware: [middlewareFn],
+                },
+            });
+          </code>
+        </pre>
+      </p>
+      <p>In this scenario, when invoking <code>users.create</code>, the user would still pass in three arguments: <code>username</code>, <code>password</code>, and <code>name</code>. The framework automatically matches the <code>username</code> value to the first argument, the <code>password</code> value to the second argument, and <code>name</code> value to the third argument of the <code>createUser</code> function. Additionally, the <code>name</code> value is optional and will provide a default value of <code>'New User'</code> if the argument is not present.</p>
+      <p>If the <code>args</code> array is present, it must match the function in arity (i.e., the number of arguments declared in the function must match the number of elements in the <code>args</code> array).</p>
+      <p>The following properties can be set:</p>
+      <table class="table">
+        <thead class="thead-default">
+          <tr>
+            <th>Property</th>
+            <th>Required?</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>handler</code></td>
+            <td>Yes</td>
+            <td>The API handler. Must be a function.</td>
+          </tr>
+          <tr>
+            <td><code>args</code></td>
+            <td>No</td>
+            <td>Function arguments. Must be an array. See below for more information.</td>
+          </tr>
+          <tr>
+            <td><code>middleware</code></td>
+            <td>No</td>
+            <td>An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>If the <code>args</code> array is present, it must match the function in arity (i.e., the number of arguments declared in the function must match the number of elements in the <code>args</code> array). Each element in the array can be either a string or an object.</p>
+      <p>If an element is an object, then the following properties are valid:</p>
+      <table class="table">
+        <thead class="thead-default">
+          <tr>
+            <th>Property</th>
+            <th>Required?</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>args[idx].name</code></td>
+            <td>No</td>
+            <td>The name of the parameter as passed by caller. Defaults to the name specified in the function.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].parse</code></td>
+            <td>No</td>
+            <td>A function that will be executed on the input. Can be used to perform type coercions. If present, should return desired value, or throw.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].validate/code></td>
+            <td>No</td>
+            <td>A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].optional</code></td>
+            <td>No</td>
+            <td>A boolean indicating whether the argument is optional. Defaults to false. If user fails to provide a required arguments, the request will fail.</td>
+          </tr>
+          <tr>
+            <td><code>args[idx].default</code></td>
+            <td>No</td>
+            <td>A primitive type or object. If user fails to provide an optional argument, the default will be provided.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>If an element is a string "argName", then it is considered equivalent to the object <code>{ name: "argName" }</code>.</p>
+      <h4>Runtime Errors</h4>
+      <hr>
+      <p>The following errors will be generated during runtime (when invoking the handler):</p>
+      <table class="table">
+        <thead class="thead-default">
+          <tr>
+            <th>Error</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>invalid_arg_name</code></td>
+            <td>One or more of the provided arguments was not expected by the handler.</td>
+          </tr>
+          <tr>
+            <td><code>missing_arg</code></td>
+            <td>One or more of the required arguments were not provided.</td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <footer>
+        <p>Developed by Built For Me</p>
+      </footer>
+    </div>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+  </body>
+</html>
