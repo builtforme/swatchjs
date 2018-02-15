@@ -27,7 +27,7 @@
   "homepage": "https://github.com/builtforme/swatchjs#readme",
   "dependencies": {
     "function-arguments": "^1.0.8",
-    "joi": "^10.6.0"
+    "joi": "^13.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.1",
