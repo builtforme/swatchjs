@@ -139,21 +139,28 @@ const model = swatch({
                 name: 'username',
                 parse: String,
                 optional: false,
+                type: 'string',
+                description: 'Username for new user',
             },
             {
                 name: 'password',
                 parse: String,
                 optional: false,
+                type: 'string'
+                description: 'Password for new user',
             },
             {
                 name: 'name',
                 parse: String,
                 optional: true,
                 default: 'New User',
+                type: 'string'
+                description: 'Display name of new user',
             },
         ],
         metadata: {
-            middleware: [middlewareFn],            
+            middleware: [middlewareFn],
+            description: 'Sample text describing this endpoint',
         },
     },
 });
@@ -192,16 +199,19 @@ If an `args` element is an object, then the following properties are valid:
 |`args[idx].validate`   | No        | A function that will be executed on the successfully parsed/coerced input value. Should not modify or return a value, should throw if invalid.
 |`args[idx].optional`   | No        | A boolean indicating whether the argument is optional. Defaults to `false`. If user fails to provide a required arguments, the request will fail.
 |`args[idx].default`    | No        | A primitive type or object. If user fails to provide an optional argument, the default will be provided.
+|`args[idx].type`       | No        | A string describing the expected type of the argument.
+|`args[idx].description`| No        | A string description for the argument.
 
 If an element is a string "argName", then it is considered equivalent to the
 object `{ name: "argName" }`.
 
 If the `metadata` object is present, the following sub-properties can be set:
 
-| Property    | Required  | Description
-|:---         |:---       |:---
-|`noAuth`     | No        | A boolean that indicates whether the authAdapter (if any is defined by [swatchKoa](../swatchjs-koa) or [swatchExpress](../swatchjs-express) options) should be skipped for this particular method handler. Defaults to `false`.
-|`middleware` | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler.
+| Property     | Required  | Description
+|:---          |:---       |:---
+|`description` | No        | A string to describe the API endpoint behavior.
+|`noAuth`      | No        | A boolean that indicates whether the authAdapter (if any is defined by [swatchKoa](../swatchjs-koa) or [swatchExpress](../swatchjs-express) options) should be skipped for this particular method handler. Defaults to `false`.
+|`middleware`  | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler.
 
 
 ## Runtime errors
