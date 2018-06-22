@@ -172,6 +172,7 @@ describe('loader', () => {
             {
               name: 'b',
               parse: Number,
+              optional: true,
             },
           ],
         },
@@ -181,8 +182,18 @@ describe('loader', () => {
       validate(model);
 
       expect(model[0].docs.args).to.deep.equal([
-        { description: '', name: 'a', type: '' },
-        { description: '', name: 'b', type: '' },
+        {
+          description: '',
+          name: 'a',
+          optional: false,
+          type: '',
+        },
+        {
+          description: '',
+          name: 'b',
+          optional: true,
+          type: '',
+        },
       ]);
       expect(model[0].docs.description).to.equal('');
     });
@@ -221,8 +232,18 @@ describe('loader', () => {
       validate(model);
 
       expect(model[0].docs.args).to.deep.equal([
-        { description: 'First param', name: 'a', type: 'number' },
-        { description: 'Second param', name: 'b', type: 'number' },
+        {
+          description: 'First param',
+          name: 'a',
+          optional: false,
+          type: 'number',
+        },
+        {
+          description: 'Second param',
+          name: 'b',
+          optional: false,
+          type: 'number',
+        },
       ]);
       expect(model[0].docs.description).to.equal('Adds two numbers');
 

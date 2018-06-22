@@ -432,7 +432,7 @@ describe('handler', () => {
         args: [
           {
             name: 'a',
-            optional: false,
+            optional: true,
             parse: Number,
             default: 1,
           },
@@ -442,6 +442,7 @@ describe('handler', () => {
       expect(handle.docs).to.deep.equal({
         args: [{
           description: '',
+          optional: true,
           name: 'a',
           type: '',
         }],
@@ -467,12 +468,14 @@ describe('handler', () => {
           },
           {
             name: 'b',
+            optional: true,
             parse: Boolean,
             type: 'boolean',
             description: 'Second param',
           },
           {
             name: 'c',
+            optional: true,
             default: [],
             type: 'array[number]',
             description: 'Third param',
@@ -489,18 +492,22 @@ describe('handler', () => {
       expect(handle.docs).to.deep.equal({
         args: [{
           description: 'First param',
+          optional: false,
           name: 'a',
           type: 'number',
         }, {
           description: 'Second param',
+          optional: true,
           name: 'b',
           type: 'boolean',
         }, {
           description: 'Third param',
+          optional: true,
           name: 'c',
           type: 'array[number]',
         }, {
           description: 'Fourth param',
+          optional: false,
           name: 'd',
           type: 'string',
         }],
