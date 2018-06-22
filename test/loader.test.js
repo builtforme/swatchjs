@@ -3,7 +3,8 @@ const load = require('../lib/loader');
 
 function validate(model) {
   model.forEach((method) => {
-    expect(method).to.be.an('object').that.has.all.keys('name', 'handle', 'validate', 'metadata');
+    expect(method).to.be.an('object').that.has.all.keys('docs', 'name', 'handle', 'validate', 'metadata');
+    expect(method.docs).to.be.an('object');
     expect(method.name).to.be.a('string');
     expect(method.handle).to.be.a('function');
     expect(method.validate).to.be.a('function');
@@ -178,6 +179,12 @@ describe('loader', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
+
+      expect(model[0].docs.args).to.deep.equal([
+        { description: '', name: 'a', type: '' },
+        { description: '', name: 'b', type: '' },
+      ]);
+      expect(model[0].docs.description).to.equal('');
     });
 
     it('should pass in middleware array', () => {
@@ -193,13 +200,18 @@ describe('loader', () => {
             {
               name: 'a',
               parse: Number,
+              type: 'number',
+              description: 'First param',
             },
             {
               name: 'b',
               parse: Number,
+              type: 'number',
+              description: 'Second param',
             },
           ],
           metadata: {
+            description: 'Adds two numbers',
             middleware,
           },
         },
@@ -207,6 +219,12 @@ describe('loader', () => {
       const model = load(api);
       expect(model).to.be.an('array').that.has.lengthOf(1);
       validate(model);
+
+      expect(model[0].docs.args).to.deep.equal([
+        { description: 'First param', name: 'a', type: 'number' },
+        { description: 'Second param', name: 'b', type: 'number' },
+      ]);
+      expect(model[0].docs.description).to.equal('Adds two numbers');
 
       expect(model[0].metadata.middleware).to.be.an('array').that.has.lengthOf(2);
       expect(model[0].metadata.middleware[0](1, 2)).to.equal(1);

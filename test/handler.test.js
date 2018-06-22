@@ -424,6 +424,91 @@ describe('handler', () => {
     });
   });
 
+  describe('documentation', () => {
+    it('should have defaults for argument type and description', () => {
+      const fn = a => (a);
+      const method = {
+        handler: fn,
+        args: [
+          {
+            name: 'a',
+            optional: false,
+            parse: Number,
+            default: 1,
+          },
+        ],
+      };
+      const handle = handler(method);
+      expect(handle.docs).to.deep.equal({
+        args: [{
+          description: '',
+          name: 'a',
+          type: '',
+        }],
+        description: '',
+      });
+    });
+
+    it('should allow documentation for type and description of params', () => {
+      const fn = (a, b, c, d) => ({
+        a,
+        b,
+        c,
+        d,
+      });
+      const method = {
+        handler: fn,
+        args: [
+          {
+            name: 'a',
+            parse: Number,
+            type: 'number',
+            description: 'First param',
+          },
+          {
+            name: 'b',
+            parse: Boolean,
+            type: 'boolean',
+            description: 'Second param',
+          },
+          {
+            name: 'c',
+            default: [],
+            type: 'array[number]',
+            description: 'Third param',
+          },
+          {
+            name: 'd',
+            parse: String,
+            type: 'string',
+            description: 'Fourth param',
+          },
+        ],
+      };
+      const handle = handler(method);
+      expect(handle.docs).to.deep.equal({
+        args: [{
+          description: 'First param',
+          name: 'a',
+          type: 'number',
+        }, {
+          description: 'Second param',
+          name: 'b',
+          type: 'boolean',
+        }, {
+          description: 'Third param',
+          name: 'c',
+          type: 'array[number]',
+        }, {
+          description: 'Fourth param',
+          name: 'd',
+          type: 'string',
+        }],
+        description: '',
+      });
+    });
+  });
+
   describe('default values', () => {
     it('should not use default values for required arguments', () => {
       const fn = a => (a);
