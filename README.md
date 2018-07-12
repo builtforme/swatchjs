@@ -152,7 +152,9 @@ const model = swatch({
                 default: 'New User',
             },
         ],
-        middleware: [middlewareFn],
+        metadata: {
+            middleware: [middlewareFn],            
+        },
     },
 });
 ```
@@ -174,7 +176,7 @@ The following properties can be set:
 |:---                   |:---       |:---
 |`handler`              | Yes       | The API handler. Must be a function.
 |`args`                 | No        | Function arguments. Must be an array. See below for more information.
-|`middleware`           | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler.
+|`metadata`             | No        | An object with additional information about the handler (see below).
 
 If the `args` array is present, it must match the function in arity (i.e., the
 number of arguments declared in the function must match the number of elements
@@ -193,6 +195,14 @@ If an element is an object, then the following properties are valid:
 
 If an element is a string "argName", then it is considered equivalent to the
 object `{ name: "argName" }`.
+
+If the `metadata` object is present, the following sub-properties can be set:
+
+| Property    | Required  | Description
+|:---         |:---       |:---
+|`noAuth`     | No        | A boolean that indicates whether the authAdapter (if any is defined by [swatchKoa](../swatchjs-koa) or [swatchExpress](../swatchjs-express) options) should be skipped for this particular method handler. Defaults to `false`.
+|`middleware` | No        | An array of functions to run as middleware. Accepts request context and callback function as params. Throw on error to abort request handler.
+
 
 ## Runtime errors
 
@@ -241,6 +251,13 @@ Each object will contain the following properties:
 |:---                   |:---                                                                       |
 |`name`                 | The name of the method. This is the same as the key in the API object.    |
 |`handle`               | A function used to execute the method handler. See [The `handle` function](#the-handle-function) below.   |
+|`metadata`             | An object with additional data about the method handler. |
+
+The `metadata` object will contain the following properties:
+
+| Property              | Description                                                               |
+|:---                   |:---                                                                       |
+|`noAuth`               | A boolean that describes whether `noAuth` was set on the method handler.  |
 |`middleware`           | An array of functions to execute as middleware before the method handler. |
 
 ### The `handle` function
