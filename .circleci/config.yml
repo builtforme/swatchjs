@@ -1,172 +1,96 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
 version: 2
+
+defaults: &defaults
+  docker:
+    - image: circleci/node:10.6
+  working_directory: ~/repo
+
+# The traditional CircleCI jobs description includes restore_cache and
+# save_cache to get performance gains across runs.  This is invalidated by
+# using "npm ci", however, because it force-removes the "node_modules"
+# directory before beginning the install.
+#
+# We do, however, make use of a CircleCI workspace to get persisted files
+# between jobs along the workflow... such that later jobs do not also need to
+# run "npm ci", they only need to attach_workspace.
+
 jobs:
+
   build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:7.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
+    <<: *defaults
     steps:
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: npm install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
-      # run tests!
+      - run: npm ci
       - run: npm test
-
-  report_code_coverage_codecov:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:7.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: npm install
-
-      - save_cache:
+      - persist_to_workspace:
+          root: .
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+            - .
 
-      # run tests!
-      - run: npm test && npm run-script codecov
-
-  report_code_coverage_coveralls:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:7.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
+  codecov:
+    <<: *defaults
     steps:
+      - attach_workspace: { at: . }
+      - run: npm run codecov
+
+  coveralls:
+    <<: *defaults
+    steps:
+      - attach_workspace: { at: . }
+      - run: npm run coveralls
+
+  bump_version:
+    <<: *defaults
+    steps:
+      # We have to use 'checkout' in order to get github's info injected into
+      # ~/.ssh/known_hosts.  We overwrite the checkout with the information from
+      # the workspace.
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: npm install
-
-      - save_cache:
+      - attach_workspace: { at: . }
+      - run: |
+            git config --global push.default simple
+            git config --global user.name "Built For Me Automation"
+            git config --global user.email "automation@builtforme.tech"
+      - run: npm version patch --message "bump version to %s [ci skip]"
+      - add_ssh_keys:
+          fingerprints:
+            - "a3:7d:73:b8:70:cc:6d:aa:6a:e7:3e:08:33:7b:69:f9"
+      - deploy: git push --follow-tags
+      - persist_to_workspace:
+          root: .
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
-      # run tests!
-      - run: npm test && npm run-script coveralls
-
-  version:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:7.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - deploy:
-          command: |
-            echo $CIRCLE_TAG
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              if [ -z "${CIRCLE_TAG}" ]; then
-                git config --global push.default simple
-                git config --global user.email "npm@builtforme.tech"
-                git config --global user.name "Built For Me Automated Publisher"
-                npm version patch
-                git push --follow-tags
-              else
-                echo "Not publishing because circle tag is ${CIRCLE_TAG}"
-              fi
-            else
-              echo "Not versioning because branch is not master."
-            fi
+            - package.json
+            - .git
 
   publish:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:7.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
+    <<: *defaults
     steps:
       - checkout
-      - deploy:
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              if [ -z "${CIRCLE_TAG}" ]; then
-                echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-                npm publish --access public
-              else
-                echo "Not publishing because circle tag is ${CIRCLE_TAG}"
-              fi
-            else
-              echo "Not publishing to npm because branch is not master."
-            fi
+      - deploy: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          npm publish --access public
 
 workflows:
   version: 2
   build_tag_publish:
     jobs:
         - build
-        - report_code_coverage_coveralls:
+        - coveralls:
             requires:
               - build
-        - report_code_coverage_codecov:
+        - codecov:
             requires:
               - build
+        - bump_version:
+            filters:
+              branches:
+                only: master
+            requires:
+              - coveralls
+              - codecov
         - publish:
+            filters:
+              branches:
+                only: master
             requires:
-              - build
+              - bump_version
