@@ -176,14 +176,14 @@ The following properties can be set:
 |:---                   |:---       |:---
 |`handler`              | Yes       | The API handler. Must be a function.
 |`args`                 | No        | Function arguments. Must be an array. See below for more information.
-|`metadata`             | No        | An object with additional information about the handler (see below).
+|`metadata`             | No        | An object describing additional properties about the API endpoint.
 
 If the `args` array is present, it must match the function in arity (i.e., the
 number of arguments declared in the function must match the number of elements
 in the `args` array). Each element in the array can be either a string or an
 object.
 
-If an element is an object, then the following properties are valid:
+If an `args` element is an object, then the following properties are valid:
 
 | Property              | Required  | Description
 |:---                   |:---       |:---

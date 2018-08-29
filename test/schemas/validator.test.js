@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 
 const serviceSchema = require('../../lib/schemas/service');
 const schemaValidator = require('../../lib/schemas/validator');

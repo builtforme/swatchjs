@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const load = require('../lib/loader');
 
 function validate(model) {
@@ -14,7 +14,7 @@ function validate(model) {
   });
 }
 
-describe('model', () => {
+describe('loader', () => {
   describe('validation', () => {
     it('should reject if API is not an object', () => {
       expect(() => load()).to.throw();
