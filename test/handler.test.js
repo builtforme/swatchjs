@@ -1,4 +1,4 @@
-const expect = require('chai').expect;
+const { expect } = require('chai');
 const handler = require('../lib/handler');
 
 const mockLogger = {
@@ -166,7 +166,12 @@ describe('handler', () => {
     });
 
     it('should throw if a parameter passed was not expected', () => {
-      expect(() => execHandler(handle, { w: '0', x: '1', y: '2', z: '3' })).to.throw('invalid_arg_name');
+      expect(() => execHandler(handle, {
+        w: '0',
+        x: '1',
+        y: '2',
+        z: '3',
+      })).to.throw('invalid_arg_name');
     });
 
     it('should invoke the handler if all required arguments were passed', () => {
