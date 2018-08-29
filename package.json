@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "nyc mocha 'test/**/*.test.js'",
-    "lint": "./node_modules/.bin/eslint --ext .js index.js lib/**/*.js test/**/*.js",
+    "lint": "./node_modules/.bin/eslint --ext .js index.js lib test",
     "coveralls": "nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js",
     "codecov": "nyc report --reporter=lcov > coverage.lcov && codecov",
     "test:debug": "mocha --debug-brk"
