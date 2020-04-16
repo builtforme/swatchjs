@@ -214,6 +214,10 @@ The following errors will be generated during runtime (when invoking the handler
 |`missing_arg`      | One or more of the required arguments were not provided.                  |
 
 
+## Logging
+
+By default if there is a logger on the context with name swatchCtx.logger it will be used to log the parameters and methods that each handler has been invoked with. If you would like to change the log level set a variable `swatchLogLevel` to `'trace'` on the `swatchCtx` object in your context.
+
 ## Exposing the API
 
 The API model created by invoking the `swatch` function can be passed to any

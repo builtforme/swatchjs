@@ -3,12 +3,14 @@ const handler = require('../lib/handler');
 
 const mockLogger = {
   info: () => {},
+  trace: () => {},
 };
 
 function execHandler(handle, args) {
   const mockCtx = {
     swatchCtx: {
       logger: mockLogger,
+      swatchLogLevel: 'trace',
       testVal: 100,
     },
   };
@@ -421,6 +423,29 @@ describe('handler', () => {
       };
       const handle = handler(method);
       expect(execHandler(handle, { a: '25', b: '50' })).to.equal(175);
+    });
+    it('should respect the swatchLogLevel parameter on swatchCtx', () => {
+      const method = {
+        handler: a => (a),
+        args: [
+          {
+            name: 'a',
+            parse: Number,
+          },
+        ],
+      };
+      const execHandlerWithLogLevel = (handle, args) => {
+        const mockCtx = {
+          swatchCtx: {
+            logger: mockLogger,
+            swatchLogLevel: 'trace',
+          },
+        };
+        handle.validate(mockCtx, args);
+        return handle.handle(mockCtx);
+      };
+      const handle = handler(method);
+      expect(execHandlerWithLogLevel(handle, { a: '25' })).to.equal(25);
     });
   });
 
