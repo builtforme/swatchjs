@@ -1,16 +1,24 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const handler = require('../lib/handler');
 
 const mockLogger = {
-  info: () => {},
-  trace: () => {},
+  info: sinon.spy(),
+  trace: sinon.spy(),
+
+  reset: () => {
+    mockLogger.info.resetHistory();
+    mockLogger.trace.resetHistory();
+  },
 };
+
+beforeEach(mockLogger.reset);
 
 function execHandler(handle, args) {
   const mockCtx = {
     swatchCtx: {
-      logger: mockLogger,
-      swatchLogLevel: 'trace',
+      // logger: mockLogger,
+      // swatchLogLevel: 'trace',
       testVal: 100,
     },
   };
@@ -34,6 +42,10 @@ describe('handler', () => {
         args: ['a'],
       };
       expect(() => handler(zeroMethod)).to.throw('invalid_arg_list');
+    });
+
+    it('should throw a TypeError if passed a non-function, non-schema', () => {
+      expect(() => handler('BOGUS')).to.throw('TypeError');
     });
 
     describe('defaults', () => {
@@ -424,28 +436,52 @@ describe('handler', () => {
       const handle = handler(method);
       expect(execHandler(handle, { a: '25', b: '50' })).to.equal(175);
     });
-    it('should respect the swatchLogLevel parameter on swatchCtx', () => {
+
+    describe('logger', () => {
       const method = {
-        handler: a => (a),
-        args: [
-          {
-            name: 'a',
-            parse: Number,
-          },
-        ],
+        handler: () => {},
       };
-      const execHandlerWithLogLevel = (handle, args) => {
+
+      const handle = handler(method);
+
+      const execHandlerWithSwatchContext = (swatchCtx) => {
         const mockCtx = {
-          swatchCtx: {
-            logger: mockLogger,
-            swatchLogLevel: 'trace',
-          },
+          swatchCtx,
         };
-        handle.validate(mockCtx, args);
+        handle.validate(mockCtx, {});
         return handle.handle(mockCtx);
       };
-      const handle = handler(method);
-      expect(execHandlerWithLogLevel(handle, { a: '25' })).to.equal(25);
+
+      it('should work without a logger', () => {
+        execHandlerWithSwatchContext({});
+        expect(mockLogger.info.callCount).to.equal(0);
+        expect(mockLogger.trace.callCount).to.equal(0);
+      });
+
+      it('should work with a logger', () => {
+        execHandlerWithSwatchContext({
+          logger: mockLogger,
+        });
+        expect(mockLogger.info.callCount).to.equal(2);
+        expect(mockLogger.trace.callCount).to.equal(0);
+      });
+
+      it('should work with a logger and logLevel "trace"', () => {
+        execHandlerWithSwatchContext({
+          logger: mockLogger,
+          swatchLogLevel: 'trace',
+        });
+        expect(mockLogger.info.callCount).to.equal(0);
+        expect(mockLogger.trace.callCount).to.equal(2);
+      });
+
+      it('should work with no logger and logLevel "trace"', () => {
+        execHandlerWithSwatchContext({
+          swatchLogLevel: 'trace',
+        });
+        expect(mockLogger.info.callCount).to.equal(0);
+        expect(mockLogger.trace.callCount).to.equal(0);
+      });
     });
   });
 
